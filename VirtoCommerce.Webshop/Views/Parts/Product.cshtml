@@ -1,0 +1,116 @@
+﻿<style>
+    .box {
+        padding: 20px;
+        -webkit-background-clip: padding-box;
+        -moz-background-clip: padding-box;
+        background-clip: padding-box;
+        -webkit-border-radius: 2px;
+        -moz-border-radius: 2px;
+        border-radius: 2px;
+        -webkit-box-shadow: 0 1px 2px rgba(71, 73, 72, 0.25);
+        -moz-box-shadow: 0 1px 2px rgba(71, 73, 72, 0.25);
+        box-shadow: 0 1px 2px rgba(71, 73, 72, 0.25);
+    }
+    .box {
+        float: left;
+        font-size: 14px;
+        line-height: 20px;
+}
+    .box.left {
+        width: 270px;
+    }
+    .box.right {
+        width: 500px;
+    }
+    .images .primary {
+        margin: -20px -20px 0;
+    }
+    .images .rpimary img {
+        border: 0;
+        height: auto;
+        max-width: 100%;
+        vertical-align: middle;
+        width: auto\9;
+    }
+    .thumbs {
+        margin: 0 -20px;
+        padding: 20px;
+        position: relative;
+    }
+    .thumbs::before {
+        background-color: #fff;
+        content: "";
+        display: block;
+        height: 16px;
+        left: 20px;
+        position: absolute;
+        top: -8px;
+        width: 16px;
+        z-index: 0;
+        -webkit-transform: rotate(45deg);
+        -moz-transform: rotate(45deg);
+        -o-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+    .thumbs ul {
+        list-style-position: inside;
+    }
+    .thumbs-list {
+        margin-left: -3%;
+        margin-bottom: -3%;
+    }
+    .thumbs-list::before {
+        content: "";
+        display: block;
+    }
+    .thumbs-list::after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+    .thumbs-list li {
+        float: left;
+        line-height: 20px;
+        list-style: none;
+        margin-bottom: 3%;
+        margin-left: 3%;
+        width: 17%;
+    }
+</style>
+
+<div class="box left">
+    <div class="images">
+        <div class="primary">
+            <img src="@Model.Product.ImageUrl" />
+        </div>
+        @if (Model.Product.Images.Count > 0)
+        {
+            <div class="thumbs">
+                <ul class="thumbs-list">
+                    @foreach (var image in Model.Product.Images)
+                    {
+                        <li>
+                            <img src="@image" />
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+</div>
+<div class="product-content">
+    <div class="box right">
+        <div class="content">
+            <div class="details">
+                <h1 class="product-title">@Model.Product.Name</h1>
+                <div class="prices">
+                    <span class="price">$@Model.Product.Price</span>
+                </div>
+            </div>
+            <div class="short-description">
+                <p>@Model.Product.Description</p>
+            </div>
+        </div>
+    </div>
+</div>

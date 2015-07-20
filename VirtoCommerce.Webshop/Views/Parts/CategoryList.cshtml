@@ -1,0 +1,45 @@
+﻿<style>
+    .main-menu {
+        list-style-position: inside;
+        margin: 0;
+        height: auto;
+    }
+    .main-menu::before {
+        content: "";
+        display: block;
+    }
+    .main-menu::after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+    .main-menu>li {
+        float: left;
+        line-height: 20px;
+        list-style: none;
+        position: relative;
+    }
+    .main-menu>li>a {
+        color: #606362;
+        display: block;
+        font-size: 12px;
+        padding: 15px 30px 15px 0;
+        text-decoration: none;
+        text-transform: uppercase;
+    }
+    .main-menu>li>a:hover {
+        color: rgb(255,110,64);
+    }
+    .main-menu>li.selected a {
+        color: rgb(255,110,64);
+    }
+</style>
+
+<ul class="main-menu">
+    @foreach (var category in Model.Categories)
+    {
+        <li class="@(category.Slug == Model.SelectedCategory ? "selected" : "")">
+            <a href="@Href(String.Format("~/Category?id={0}", category.Slug))">@category.Name</a>
+        </li>
+    }
+</ul>
