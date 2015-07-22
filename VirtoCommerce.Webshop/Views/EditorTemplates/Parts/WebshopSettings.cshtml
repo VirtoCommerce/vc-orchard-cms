@@ -17,12 +17,13 @@
 </fieldset>
 <button id="btn-test-api" type="button">@T("Test API connection")</button>
 
-<script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.js"></script>
+<script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>
 <script>
     $(function () {
         var btnTestApi = $("#btn-test-api");
 
         btnTestApi.on("click", function () {
+            btnTestApi.text("@T("Please wait...")");
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("TestApiConnection", new { controller = "WebshopSettings", area = "VirtoCommerce.Webshop" })",
@@ -33,11 +34,13 @@
                     __RequestVerificationToken: "@Html.AntiForgeryTokenValueOrchard()"
                 },
                 success: function (jsonResult) {
+                    btnTestApi.text("@T("Test API connection")");
                     if (jsonResult) {
-                        alert(jsonResult.message);
+                        alert(jsonResult);
                     }
                 },
                 error: function () {
+                    btnTestApi.text("@T("Test API connection")");
                     alert("@T("Something bad happened =(")");
                 }
             });

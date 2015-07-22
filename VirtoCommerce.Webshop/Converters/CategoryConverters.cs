@@ -24,6 +24,8 @@ namespace VirtoCommerce.Webshop.Converters
                 }
             }
 
+            categoryModel.UrlPattern = "~/Category?id={0}";
+
             return categoryModel;
         }
     }

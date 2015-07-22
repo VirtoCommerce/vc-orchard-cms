@@ -1,0 +1,43 @@
+﻿.ws-main-menu {
+    font-family: "Lato", sans-serif;
+    height: auto;
+    list-style-position: inside;
+    margin: 0;
+    padding: 0;
+}
+    .ws-main-menu::after {
+        clear: both;
+        content: "";
+        display: table;
+    }
+    .ws-main-menu::before {
+        content: "";
+        display: block;
+    }
+    .ws-main-menu li {
+        line-height: 20px;
+        list-style: none;
+    }
+    .ws-main-menu>li {
+        float: left;
+    }
+    .ws-main-menu a {
+        display: block;
+        font-size: 12px;
+        text-decoration: none;
+        -webkit-transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
+        -moz-transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
+        -o-transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
+        transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out
+    }
+    .ws-main-menu a:hover, a:focus {
+        color: #148f77;
+    }
+    .ws-main-menu>li>a {
+        color: #606362;
+        padding: 15px 30px 15px 0;
+        text-transform: uppercase;
+    }
+    .ws-main-menu>li>a.ws-selected {
+        color: #148f77;
+    }

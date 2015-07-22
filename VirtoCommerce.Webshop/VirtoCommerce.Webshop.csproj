@@ -77,6 +77,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Styles\webshop.css" />
     <Content Include="Web.config" />
     <Content Include="Scripts\Web.config" />
     <Content Include="Styles\Web.config" />
@@ -94,7 +95,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client\ApiClient.cs" />
+    <Compile Include="Client\VirtoCommerceClient.cs" />
+    <Compile Include="Client\ApiGetRequest.cs" />
+    <Compile Include="Client\ApiResponse.cs" />
     <Compile Include="Client\DataContracts\Asset.cs" />
     <Compile Include="Client\DataContracts\Association.cs" />
     <Compile Include="Client\DataContracts\Category.cs" />
@@ -104,50 +107,54 @@
     <Compile Include="Client\DataContracts\Inventory.cs" />
     <Compile Include="Client\DataContracts\InventoryStatus.cs" />
     <Compile Include="Client\DataContracts\ItemImage.cs" />
+    <Compile Include="Client\DataContracts\PaymentMethod.cs" />
     <Compile Include="Client\DataContracts\Price.cs" />
     <Compile Include="Client\DataContracts\Product.cs" />
     <Compile Include="Client\DataContracts\ProductSearchResult.cs" />
     <Compile Include="Client\DataContracts\ResponseCollection.cs" />
     <Compile Include="Client\DataContracts\SeoKeyword.cs" />
-    <Compile Include="Client\HmacMessageProcessingHandler.cs" />
-    <Compile Include="Client\HmacUtility.cs" />
+    <Compile Include="Client\DataContracts\Store.cs" />
+    <Compile Include="Client\Security\HmacMessageProcessingHandler.cs" />
+    <Compile Include="Client\Security\HmacUtility.cs" />
+    <Compile Include="Client\IVirtoCommerceClient.cs" />
+    <Compile Include="Client\DataContracts\ManagementError.cs" />
     <Compile Include="Controllers\WebshopSettingsController.cs" />
     <Compile Include="Converters\CategoryConverters.cs" />
+    <Compile Include="Converters\PriceConverters.cs" />
     <Compile Include="Converters\ProductConverters.cs" />
-    <Compile Include="Drivers\CategoryListDriver.cs" />
-    <Compile Include="Drivers\ProductDriver.cs" />
+    <Compile Include="Converters\ShopConverters.cs" />
+    <Compile Include="Drivers\CategoryListPartDriver.cs" />
     <Compile Include="Drivers\ProductListDriver.cs" />
-    <Compile Include="Handlers\ProductListHandler.cs" />
     <Compile Include="Handlers\WebshopSettingsHandler.cs" />
     <Compile Include="Models\CategoryListPart.cs" />
     <Compile Include="Models\ProductListPart.cs" />
-    <Compile Include="Models\ProductListPartRecord.cs" />
-    <Compile Include="Models\ProductPart.cs" />
     <Compile Include="Models\WebshopSettingsPart.cs" />
+    <Compile Include="ResourceManifest.cs" />
+    <Compile Include="Services\CatalogService.cs" />
+    <Compile Include="Services\ICatalogService.cs" />
+    <Compile Include="Services\IPriceService.cs" />
+    <Compile Include="Services\PriceService.cs" />
     <Compile Include="ViewModels\Category.cs" />
-    <Compile Include="Migrations.cs" />
+    <Compile Include="ViewModels\PagedList.cs" />
+    <Compile Include="ViewModels\Price.cs" />
     <Compile Include="ViewModels\Product.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Parts\CategoryList.cshtml" />
+    <Compile Include="Migrations.cs" />
+    <Compile Include="ViewModels\Shop.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Extensions\" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Views\EditorTemplates\Parts\WebshopSettings.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Views\Parts\CategoryList.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Placement.info" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Parts\ProductList.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Parts\Product.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\EditorTemplates\Parts\ProductList.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -7,7 +7,7 @@ namespace VirtoCommerce.Webshop.Converters
 {
     public static class ProductConverters
     {
-        public static Product ToViewModel(this DataContracts.Product product, DataContracts.Price price)
+        public static Product ToViewModel(this DataContracts.Product product, Price price)
         {
             var productModel = new Product();
 
@@ -36,7 +36,7 @@ namespace VirtoCommerce.Webshop.Converters
 
             if (price != null)
             {
-                productModel.Price = price.Sale.HasValue ? price.Sale.Value : price.List;
+                productModel.Price = price.Sale.HasValue ? price.Sale.Value : price.Original;
             }
 
             productModel.Slug = product.Code;
@@ -49,6 +49,8 @@ namespace VirtoCommerce.Webshop.Converters
                     productModel.Slug = seo.Keyword;
                 }
             }
+
+            productModel.UrlPattern = "~/Product/{0}";
 
             return productModel;
         }

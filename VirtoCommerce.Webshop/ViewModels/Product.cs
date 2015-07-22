@@ -22,5 +22,7 @@ namespace VirtoCommerce.Webshop.ViewModels
         public string ImageUrl { get; set; }
 
         public ICollection<string> Images { get; set; }
+
+        public string UrlPattern { get; set; }
     }
 }
