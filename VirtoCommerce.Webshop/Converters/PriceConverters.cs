@@ -9,6 +9,7 @@ namespace VirtoCommerce.Webshop.Converters
         {
             var priceModel = new Price();
 
+            priceModel.Actual = price.List;
             priceModel.Original = price.List;
             priceModel.PricelistId = price.PricelistId;
             priceModel.ProductId = price.ProductId;

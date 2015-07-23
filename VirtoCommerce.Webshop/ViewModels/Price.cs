@@ -9,5 +9,7 @@
         public decimal Original { get; set; }
 
         public decimal? Sale { get; set; }
+
+        public decimal Actual { get; set; }
     }
 }

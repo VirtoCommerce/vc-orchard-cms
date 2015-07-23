@@ -1,28 +1,24 @@
-﻿using JetBrains.Annotations;
-using Orchard;
-using Orchard.ContentManagement;
-using Orchard.ContentManagement.Drivers;
+﻿using Orchard.ContentManagement.Drivers;
 using Orchard.Localization;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
-using VirtoCommerce.Webshop.Client;
-using VirtoCommerce.Webshop.Converters;
 using VirtoCommerce.Webshop.Models;
-using VirtoCommerce.Webshop.ViewModels;
+using VirtoCommerce.Webshop.Services;
 
 namespace VirtoCommerce.Webshop.Drivers
 {
-    [UsedImplicitly]
     public class CategoryListDriver : ContentPartDriver<CategoryListPart>
     {
-        private readonly IOrchardServices _orchardServices;
+        private const string StoreId = "SampleStore";
+        private const string Culture = "en-US";
 
-        public CategoryListDriver(IOrchardServices orchardServices)
+        private readonly ICatalogService _catalogService;
+
+        public CategoryListDriver(ICatalogService catalogService)
         {
-            _orchardServices = orchardServices;
+            _catalogService = catalogService;
 
             T = NullLocalizer.Instance;
         }
@@ -31,30 +27,17 @@ namespace VirtoCommerce.Webshop.Drivers
 
         protected override DriverResult Display(CategoryListPart part, string displayType, dynamic shapeHelper)
         {
-            var settings = _orchardServices.WorkContext.CurrentSite.As<WebshopSettingsPart>();
-            var apiClient = new ApiClient(settings.ApiUrl, settings.AppId, settings.SecretKey);
+            var categoryModels = _catalogService.GetCategoriesAsync(StoreId, Culture).Result;
 
-            string categoryId = null;
-            var categorySegment = HttpContext.Current.Request.Url.Segments.FirstOrDefault(s => s.Equals("Category", StringComparison.OrdinalIgnoreCase));
-            if (categorySegment != null)
+            string categorySlug = null;
+            if (HttpContext.Current.Request.Url.Segments.Any(s => s.Equals("Category", StringComparison.OrdinalIgnoreCase)))
             {
-                categoryId = HttpContext.Current.Request.QueryString["id"];
-            }
-
-            var categoriesResponse = Task.Run(() => apiClient.GetCategoriesAsync()).Result;
-
-            var categories = new List<Category>();
-            if (categoriesResponse != null)
-            {
-                foreach (var category in categoriesResponse.Items)
-                {
-                    categories.Add(category.ToViewModel());
-                }
+                categorySlug = HttpContext.Current.Request.QueryString["slug"];
             }
 
             return ContentShape("Parts_CategoryList", () => shapeHelper.Parts_CategoryList(
-                Categories: categories,
-                SelectedCategory: categoryId));
+                CategorySlug: categorySlug,
+                Categories: categoryModels));
         }
     }
 }

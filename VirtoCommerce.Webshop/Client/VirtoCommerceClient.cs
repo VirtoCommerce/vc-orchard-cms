@@ -1,13 +1,16 @@
-﻿using Orchard;
+﻿using Newtonsoft.Json;
+using Orchard;
 using Orchard.ContentManagement;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using VirtoCommerce.Webshop.Client.DataContracts;
+using VirtoCommerce.Webshop.Client.DataContracts.Cart;
 using VirtoCommerce.Webshop.Client.Security;
 using VirtoCommerce.Webshop.Models;
 
@@ -65,7 +68,7 @@ namespace VirtoCommerce.Webshop.Client
             string requestUrl = String.Format("{0}/mp/stores", ApiUrl);
             using (var httpResponse = await _httpClient.Value.GetAsync(requestUrl).ConfigureAwait(false))
             {
-                return await GetApiResponseAsync<IEnumerable<Store>>(httpResponse);
+                return await HandleApiResponseAsync<IEnumerable<Store>>(httpResponse);
             }
         }
 
@@ -74,7 +77,7 @@ namespace VirtoCommerce.Webshop.Client
             string requestUrl = String.Format("{0}/mp/categories?{1}&parentId={2}", ApiUrl, request.BuildQueryString(), null);
             using (var httpResponse = await _httpClient.Value.GetAsync(requestUrl).ConfigureAwait(false))
             {
-                return await GetApiResponseAsync<ResponseCollection<Category>>(httpResponse);
+                return await HandleApiResponseAsync<ResponseCollection<Category>>(httpResponse);
             }
         }
 
@@ -83,7 +86,7 @@ namespace VirtoCommerce.Webshop.Client
             string requestUrl = String.Format("{0}/mp/categories?{1}", ApiUrl, request.BuildQueryString());
             using (var httpResponse = await _httpClient.Value.GetAsync(requestUrl).ConfigureAwait(false))
             {
-                return await GetApiResponseAsync<Category>(httpResponse);
+                return await HandleApiResponseAsync<Category>(httpResponse);
             }
         }
 
@@ -92,7 +95,7 @@ namespace VirtoCommerce.Webshop.Client
             string requestUrl = String.Format("{0}/mp/products/search?{1}", ApiUrl, request.BuildQueryString());
             using (var httpResponse = await _httpClient.Value.GetAsync(requestUrl).ConfigureAwait(false))
             {
-                return await GetApiResponseAsync<ProductSearchResult>(httpResponse);
+                return await HandleApiResponseAsync<ProductSearchResult>(httpResponse);
             }
         }
 
@@ -101,25 +104,73 @@ namespace VirtoCommerce.Webshop.Client
             string requestUrl = String.Format("{0}/mp/products?{1}", ApiUrl, request.BuildQueryString());
             using (var httpResponse = await _httpClient.Value.GetAsync(requestUrl).ConfigureAwait(false))
             {
-                return await GetApiResponseAsync<Product>(httpResponse);
+                return await HandleApiResponseAsync<Product>(httpResponse);
             }
         }
 
-        public async Task<ApiResponse<IEnumerable<string>>> GetPricelistsAsync(string catalogId, string currency)
+        public async Task<ApiResponse<IEnumerable<string>>> GetPricelistsAsync(ApiGetRequest request)
         {
-            string requestUrl = String.Format("{0}/mp/pricelists?catalog={1}&currency={2}", ApiUrl, catalogId, currency);
+            string requestUrl = String.Format("{0}/mp/pricelists?{1}", ApiUrl, request.BuildQueryString());
             using (var httpResponse = await _httpClient.Value.GetAsync(requestUrl).ConfigureAwait(false))
             {
-                return await GetApiResponseAsync<IEnumerable<string>>(httpResponse);
+                return await HandleApiResponseAsync<IEnumerable<string>>(httpResponse);
             }
         }
 
-        public async Task<ApiResponse<IEnumerable<Price>>> GetPricesAsync(IEnumerable<string> pricelists, IEnumerable<string> productIds)
+        public async Task<ApiResponse<IEnumerable<Price>>> GetPricesAsync(ApiGetRequest request)
         {
-            string requestUrl = String.Format("{0}/mp/prices?pricelists={1}&products={2}", ApiUrl, String.Join(",", pricelists), String.Join(",", productIds));
+            string requestUrl = String.Format("{0}/mp/prices?{1}", ApiUrl, request.BuildQueryString());
             using (var httpResponse = await _httpClient.Value.GetAsync(requestUrl).ConfigureAwait(false))
             {
-                return await GetApiResponseAsync<IEnumerable<Price>>(httpResponse);
+                return await HandleApiResponseAsync<IEnumerable<Price>>(httpResponse);
+            }
+        }
+
+        public async Task<ApiResponse<object>> CreateShoppingCartAsync(ShoppingCart shoppingCart)
+        {
+            var requestUrl = String.Format("{0}/cart/carts", ApiUrl);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+            requestMessage.Content = new ObjectContent<ShoppingCart>(shoppingCart, MediaTypeFormatter);
+
+            using (var httpResponse = await _httpClient.Value.SendAsync(requestMessage).ConfigureAwait(false))
+            {
+                return await HandleApiResponseAsync<object>(httpResponse);
+            }
+        }
+
+        public async Task<ApiResponse<ShoppingCart>> GetShoppingCartAsync(ApiGetRequest request)
+        {
+            var requestUrl = String.Format("{0}/cart/{1}/{2}/carts/current", ApiUrl, request.StoreId, request.CustomerId);
+            using (var httpResponse = await _httpClient.Value.GetAsync(requestUrl).ConfigureAwait(false))
+            {
+                return await HandleApiResponseAsync<ShoppingCart>(httpResponse);
+            }
+        }
+
+        public async Task<ApiResponse<object>> UpdateShoppingCartAsync(ShoppingCart shoppingCart)
+        {
+            var requestUrl = String.Format("{0}/cart/carts", ApiUrl);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Put, requestUrl);
+            requestMessage.Content = new ObjectContent<ShoppingCart>(shoppingCart, MediaTypeFormatter);
+
+            using (var httpResponse = await _httpClient.Value.SendAsync(requestMessage).ConfigureAwait(false))
+            {
+                return await HandleApiResponseAsync<object>(httpResponse);
+            }
+        }
+
+        public async Task<ApiResponse<object>> DeleteShoppingCartAsync(IEnumerable<string> shoppingCartIds)
+        {
+            var requestUrl = String.Format("{0}/cart/carts");
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Delete, requestUrl);
+            requestMessage.Content = new ObjectContent<IEnumerable<string>>(shoppingCartIds, MediaTypeFormatter);
+
+            using (var httpResponse = await _httpClient.Value.SendAsync(requestMessage).ConfigureAwait(false))
+            {
+                return await HandleApiResponseAsync<object>(httpResponse);
             }
         }
 
@@ -155,13 +206,30 @@ namespace VirtoCommerce.Webshop.Client
             return httpClient;
         }
 
-        private async Task<ApiResponse<T>> GetApiResponseAsync<T>(HttpResponseMessage httpResponse) where T : class
+        private MediaTypeFormatter MediaTypeFormatter
+        {
+            get
+            {
+                var jsonFormatter = new JsonMediaTypeFormatter
+                {
+                    SerializerSettings =
+                    {
+                        DefaultValueHandling = DefaultValueHandling.Ignore,
+                        NullValueHandling = NullValueHandling.Ignore
+                    }
+                };
+
+                return jsonFormatter;
+            }
+        }
+
+        private async Task<ApiResponse<T>> HandleApiResponseAsync<T>(HttpResponseMessage httpResponse) where T : class
         {
             var apiResponse = new ApiResponse<T>();
 
             if (httpResponse.IsSuccessStatusCode)
             {
-                apiResponse.Body = await httpResponse.Content.ReadAsAsync<T>();
+                apiResponse.Content = await httpResponse.Content.ReadAsAsync<T>();
             }
             else
             {
@@ -176,6 +244,10 @@ namespace VirtoCommerce.Webshop.Client
             if (httpResponse.StatusCode == HttpStatusCode.InternalServerError)
             {
                 return await httpResponse.Content.ReadAsAsync<ManagementError>();
+            }
+            else if (httpResponse.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
             }
             else
             {

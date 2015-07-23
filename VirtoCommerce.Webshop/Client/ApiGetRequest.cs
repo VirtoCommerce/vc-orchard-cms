@@ -16,8 +16,6 @@ namespace VirtoCommerce.Webshop.Client
 
         public string Outline { get; set; }
 
-        public IEnumerable<string> Pricelists { get; set; }
-
         public string Search { get; set; }
 
         public int? Skip { get; set; }
@@ -31,6 +29,20 @@ namespace VirtoCommerce.Webshop.Client
         public DateTime? DateFrom { get; set; }
 
         public int? ResponseGroup { get; set; }
+
+        public string Keyword { get; set; }
+
+        public string Code { get; set; }
+
+        public string Currency { get; set; }
+
+        public string CatalogId { get; set; }
+
+        public IEnumerable<string> PricelistIds { get; set; }
+
+        public IEnumerable<string> ProductIds { get; set; }
+
+        public string CustomerId { get; set; }
 
         public string BuildQueryString()
         {
@@ -59,9 +71,9 @@ namespace VirtoCommerce.Webshop.Client
                 parameters.Add("outline", Outline);
             }
 
-            if (Pricelists != null && Pricelists.Count() > 0)
+            if (PricelistIds != null && PricelistIds.Count() > 0)
             {
-                parameters.Add("pricelists", String.Join(",", Pricelists));
+                parameters.Add("pricelists", String.Join(",", PricelistIds));
             }
 
             if (!String.IsNullOrEmpty(Search))
@@ -93,6 +105,36 @@ namespace VirtoCommerce.Webshop.Client
             if (ResponseGroup.HasValue)
             {
                 parameters.Add("responseGroup", ResponseGroup.Value.ToString(CultureInfo.InvariantCulture));
+            }
+
+            if (!String.IsNullOrEmpty(Keyword))
+            {
+                parameters.Add("keyword", Keyword);
+            }
+
+            if (!String.IsNullOrEmpty(Code))
+            {
+                parameters.Add("code", Keyword);
+            }
+
+            if (!String.IsNullOrEmpty(CatalogId))
+            {
+                parameters.Add("catalog", CatalogId);
+            }
+
+            if (!String.IsNullOrEmpty(Currency))
+            {
+                parameters.Add("currency", Currency);
+            }
+
+            if (ProductIds != null && ProductIds.Count() > 0)
+            {
+                parameters.Add("products", String.Join(",", ProductIds));
+            }
+
+            if (!String.IsNullOrEmpty(CustomerId))
+            {
+                parameters.Add("customerId", CustomerId);
             }
 
             var stringList = new List<string>();

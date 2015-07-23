@@ -7,7 +7,7 @@
     @foreach (var category in Model.Categories)
     {
         <li>
-            <a class="@(category.Slug == Model.SelectedCategorySlug ? "ws-selected" : String.Empty)" href="@Href(String.Format(category.UrlPattern, category.Slug))">
+            <a class="@(category.Slug == Model.CategorySlug ? "ws-selected" : String.Empty)" href="@Href(String.Format(category.UrlPattern, category.Slug))">
                 @category.Name
             </a>
         </li>

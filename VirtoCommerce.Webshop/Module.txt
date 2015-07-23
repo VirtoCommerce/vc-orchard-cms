@@ -5,6 +5,7 @@ Website: http://virtocommerce.com
 Version: 1.0
 OrchardVersion: 1.0
 Description: Widgets for creating webshop based on VirtoCommerce 2 platform.
+Category: Commerce
 Features:
     VirtoCommerce.Webshop:
         Widgets for creating webshop based on VirtoCommerce 2 platform.

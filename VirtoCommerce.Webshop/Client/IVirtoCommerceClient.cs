@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VirtoCommerce.Webshop.Client.DataContracts;
+using VirtoCommerce.Webshop.Client.DataContracts.Cart;
+using VirtoCommerce.Webshop.Client.DataContracts.Order;
 
 namespace VirtoCommerce.Webshop.Client
 {
@@ -20,9 +22,17 @@ namespace VirtoCommerce.Webshop.Client
 
         Task<ApiResponse<Product>> GetProductAsync(ApiGetRequest request);
 
-        Task<ApiResponse<IEnumerable<string>>> GetPricelistsAsync(string catalogId, string currency);
+        Task<ApiResponse<IEnumerable<string>>> GetPricelistsAsync(ApiGetRequest request);
 
-        Task<ApiResponse<IEnumerable<Price>>> GetPricesAsync(IEnumerable<string> pricelists, IEnumerable<string> productIds);
+        Task<ApiResponse<IEnumerable<Price>>> GetPricesAsync(ApiGetRequest request);
+
+        Task<ApiResponse<object>> CreateShoppingCartAsync(ShoppingCart shoppingCart);
+
+        Task<ApiResponse<ShoppingCart>> GetShoppingCartAsync(ApiGetRequest request);
+
+        Task<ApiResponse<object>> UpdateShoppingCartAsync(ShoppingCart shoppingCart);
+
+        Task<ApiResponse<Object>> DeleteShoppingCartAsync(IEnumerable<string> shoppingCartIds);
 
         void Dispose();
     }

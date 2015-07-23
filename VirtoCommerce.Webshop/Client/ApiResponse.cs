@@ -4,7 +4,7 @@ namespace VirtoCommerce.Webshop.Client
 {
     public class ApiResponse<T> where T : class
     {
-        public T Body { get; set; }
+        public T Content { get; set; }
 
         public ManagementError Error { get; set; }
     }

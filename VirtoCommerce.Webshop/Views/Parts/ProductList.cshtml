@@ -1,141 +1,31 @@
-﻿<style>
-    ul.product-list {
-        list-style-position: inside;
-        padding: 0;
-    }
-    .product-list {
-        margin-right: -30px;
-        overflow: visible !important;
-    }
-    .product-list::before {
-        content: "";
-        display: block;
-    }
-    .product-list::after {
-        clear: both;
-        content: "";
-        display: table;
-    }
-    .product-list li {
-        float: left;
-        list-style: none;
-        margin-bottom: 30px;
-        margin-right: 30px;
-        width: 260px;
-    }
-    .product-list a {
-        color: inherit;
-        display: block;
-        position: relative;
-        text-decoration: none;
-        z-index: 20;
-        -webkit-box-shadow: 0 1px 2px rgba(71, 73, 72, 0.19999999999999996);
-        -moz-box-shadow: 0 1px 2px rgba(71, 73, 72, 0.19999999999999996);
-        box-shadow: 0 1px 2px rgba(71, 73, 72, 0.19999999999999996);
-    }
-    .product-list a .image {
-        position: relative;
-    }
-    .product-list a .image img {
-        border: 0;
-        display: block;
-        height: auto;
-        max-width: 100%;
-        vertical-align: middle;
-        width: 100%;
-        -ms-interpolation-mode: bicubic;
-    }
-    .product-list a .title {
-        background-color: #f0f0f0;
-        padding: 20px;
-        position: relative;
-    }
-    .product-list a .title::before {
-        background-color: #f0f0f0;
-        content: "";
-        display: block;
-        height: 16px;
-        left: 20px;
-        position: absolute;
-        top: -8px;
-        width: 16px;
-        -webkit-transform: rotate(45deg);
-        -moz-transform: rotate(45deg);
-        -o-transform: rotate(45deg);
-        -ms-transform: rotate(45deg);
-        transform: rotate(45deg);
-    }
-    .product-list a .title .prices {
-        float: right;
-        height: 20px;
-        line-height: 20px;
-        margin-left: 20px;
-        text-align: right;
-    }
-    .product-list a .title h3 {
-        font-size: 14px;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-        line-height: 20px;
-        margin: 0;
-    }
-    .product-list a .title .prices .price {
-        color: rgb(255,110,64);
-        font-size: 14px;
-        font-weight: 600;
-    }
-    .paging {
-        text-align: center;
-    }
-    .paging span {
-        background-color: #f0f0f0;
-        display: inline-block;
-        font-size: 16px;
-        font-weight: 600;
-        line-height: 30px;
-        min-width: 30px;
-        text-align: center;
-        -webkit-border-radius: 2px;
-        -moz-border-rafius: 2px;
-        border-radius: 2px;
-    }
-    .paging a {
-        color: #999;
-        text-decoration: none;
-    }
-    .paging span.current {
-        background-color: rgb(255,152,0);
-    }
-</style>
-
-@if (Model.PagesCount > 1)
-{
-    <div class="paging">
-        @for (int p = 1; p <= Model.PagesCount; p++)
-        {
-            if (Model.Page != p)
-            {
-                <a href="@Href(String.Format("~/Category?id={0}&p={1}", Model.Slug, p))"><span>@p</span></a>
-            }
-            else
-            {
-                <span class="current">@p</span>
-            }
-        }
-    </div>
+﻿@{
+    Style.Require("LatoFont");
+    Style.Require("Webshop");
 }
 
-<ul class="product-list">
+<ul class="ws-product-list" id="isotope-content">
     @foreach (var product in Model.Products)
     {
         <li>
-            <a href="@Href(String.Format("~/Product?id={0}", product.Slug))">
-                <div class="image">
-                    <img src="@product.ImageUrl" />
+            <a href="@Href(String.Format(product.UrlPattern, product.Slug))" title="@product.Name">
+                <div class="ws-image">
+                    <img alt="@product.Name" src="@product.ImageUrl" />
+                    @if (product.Price.Sale > 0 && product.Price.Sale != product.Price.Original)
+                    {
+                        <span class="ws-badge ws-badge-sale">@T("SALE")</span>
+                    }
                 </div>
-                <div class="title">
-                    <div class="prices">
-                        <span class="price">$@product.Price</span>
+                <div class="ws-title">
+                    <div class="ws-prices">
+                        @if (product.Price.Sale > 0 && product.Price.Sale != product.Price.Original)
+                        {
+                            <del class="ws-base">
+                                <span class="ws-amount">$@product.Price.Sale.Value</span>
+                            </del>
+                        }
+                        <span class="ws-price">
+                            <span class="ws-amount">$@product.Price.Original</span>
+                        </span>
                     </div>
                     <h3>@product.Name</h3>
                 </div>
@@ -143,20 +33,3 @@
         </li>
     }
 </ul>
-
-@if (Model.PagesCount > 1)
-{
-    <div class="paging">
-        @for (int p = 1; p <= Model.PagesCount; p++)
-        {
-            if (Model.Page != p)
-            {
-                <a href="@Href(String.Format("~/Category?id={0}&p={1}", Model.Slug, p))"><span>@p</span></a>
-            }
-            else
-            {
-                <span class="current">@p</span>
-            }
-        }
-    </div>
-}

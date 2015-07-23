@@ -13,6 +13,8 @@ namespace VirtoCommerce.Webshop.Services
 
         Task<PagedList<Product>> SearchProductsAsync(string storeId, string culture, string categorySlug, int skip, int take, IEnumerable<string> pricelists);
 
-        Task<Product> GetProductAsync(string storeId, string culture, string slug);
+        Task<Product> GetProductBySlugAsync(string storeId, string culture, string pricelistId, string slug);
+
+        Task<Product> GetProductBySkuAsync(string storeId, string culture, string pricelistId, string sku);
     }
 }

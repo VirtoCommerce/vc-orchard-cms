@@ -38,7 +38,7 @@ namespace VirtoCommerce.Webshop.Drivers
             int page = 1;
             if (httpRequest.Url.Segments.Any(s => s.Equals("Category", StringComparison.OrdinalIgnoreCase)))
             {
-                categorySlug = httpRequest.QueryString["id"];
+                categorySlug = httpRequest.QueryString["slug"];
 
                 if (httpRequest.QueryString["p"] != null)
                 {
@@ -48,15 +48,21 @@ namespace VirtoCommerce.Webshop.Drivers
 
             PagedList<Product> productPagedList = null;
 
+            var pricelists = _priceService.GetPricelistsAsync(CatalogId, Currency).Result;
+
+            Category categoryModel = null;
+
             if (!String.IsNullOrEmpty(categorySlug))
             {
-                var pricelists = _priceService.GetPricelistsAsync(CatalogId, Currency).Result;
-
-                productPagedList = _catalogService.SearchProductsAsync(StoreId, Culture, categorySlug, (page - 1) * PageSize, PageSize, pricelists).Result;
+                categoryModel = _catalogService.GetCategoryAsync(StoreId, Culture, categorySlug).Result;
             }
 
+            string categoryId = categoryModel != null ? categoryModel.Id : null;
+
+            productPagedList = _catalogService.SearchProductsAsync(StoreId, Culture, categoryId, (page - 1) * PageSize, PageSize, pricelists).Result;
+
             return ContentShape("Parts_ProductList", () => shapeHelper.Parts_ProductList(
-                SelectedCategorySlug: categorySlug,
+                Category: categoryModel,
                 Products: productPagedList));
         }
 

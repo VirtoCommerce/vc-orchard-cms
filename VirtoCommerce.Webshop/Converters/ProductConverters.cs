@@ -34,11 +34,8 @@ namespace VirtoCommerce.Webshop.Converters
             productModel.ImageUrl = product.PrimaryImage != null ? product.PrimaryImage.Src : null;
             productModel.Name = product.Name;
 
-            if (price != null)
-            {
-                productModel.Price = price.Sale.HasValue ? price.Sale.Value : price.Original;
-            }
-
+            productModel.Price = price;
+            productModel.Sku = product.Code;
             productModel.Slug = product.Code;
 
             if (product.Seo != null)
@@ -50,9 +47,23 @@ namespace VirtoCommerce.Webshop.Converters
                 }
             }
 
-            productModel.UrlPattern = "~/Product/{0}";
+            productModel.UrlPattern = "~/Product?slug={0}";
 
             return productModel;
+        }
+
+        public static LineItem ToLineItem(this Product product, int quantity)
+        {
+            var lineItem = new LineItem();
+
+            lineItem.ImageUrl = product.ImageUrl;
+            lineItem.Name = product.Name;
+            lineItem.Price = product.Price;
+            lineItem.ProductId = product.Id;
+            lineItem.Quantity = quantity;
+            lineItem.Sku = product.Sku;
+
+            return lineItem;
         }
     }
 }

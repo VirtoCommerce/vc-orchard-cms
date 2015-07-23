@@ -20,7 +20,13 @@ namespace VirtoCommerce.Webshop.Services
         {
             IEnumerable<string> pricelists = null;
 
-            var apiResponse = await _apiClient.GetPricelistsAsync("", "USD").ConfigureAwait(false);
+            var apiRequest = new ApiGetRequest
+            {
+                CatalogId = catalogId,
+                Currency = currency
+            };
+
+            var apiResponse = await _apiClient.GetPricelistsAsync(apiRequest).ConfigureAwait(false);
             if (apiResponse != null)
             {
                 if (apiResponse.Error != null)
@@ -28,9 +34,9 @@ namespace VirtoCommerce.Webshop.Services
                     // TODO: Do something with errors
                     throw new Exception(apiResponse.Error.StackTrace);
                 }
-                if (apiResponse.Body != null)
+                if (apiResponse.Content != null)
                 {
-                    pricelists = apiResponse.Body;
+                    pricelists = apiResponse.Content;
                 }
             }
 
@@ -41,7 +47,13 @@ namespace VirtoCommerce.Webshop.Services
         {
             var priceModels = new List<Price>();
 
-            var apiResponse = await _apiClient.GetPricesAsync(pricelists, productIds);
+            var apiRequest = new ApiGetRequest
+            {
+                PricelistIds = pricelists,
+                ProductIds = productIds
+            };
+
+            var apiResponse = await _apiClient.GetPricesAsync(apiRequest);
             if (apiResponse != null)
             {
                 if (apiResponse.Error != null)
@@ -49,9 +61,9 @@ namespace VirtoCommerce.Webshop.Services
                     // TODO: Do something with errors
                     throw new Exception(apiResponse.Error.StackTrace);
                 }
-                if (apiResponse.Body != null)
+                if (apiResponse.Content != null)
                 {
-                    foreach (var price in apiResponse.Body)
+                    foreach (var price in apiResponse.Content)
                     {
                         priceModels.Add(price.ToViewModel());
                     }

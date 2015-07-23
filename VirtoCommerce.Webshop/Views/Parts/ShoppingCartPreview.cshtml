@@ -1,0 +1,12 @@
+﻿@{
+    Style.Require("Webshop");
+}
+
+<div class="ws-mini-cart">
+    <a href="@Href("~/Cart")" title="@T("Cart")">
+        @if (Model.LineItemCount > 0)
+        {
+            <span>@Model.LineItemCount</span>
+        }
+    </a>
+</div>
