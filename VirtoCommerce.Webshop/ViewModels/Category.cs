@@ -8,6 +8,12 @@
 
         public string Name { get; set; }
 
-        public string UrlPattern { get; set; }
+        public string UrlPattern
+        {
+            get
+            {
+                return "~/Category?id={0}";
+            }
+        }
     }
 }

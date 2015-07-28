@@ -1,6 +1,9 @@
-﻿using Orchard.ContentManagement.Drivers;
+﻿using Orchard;
+using Orchard.ContentManagement;
+using Orchard.ContentManagement.Drivers;
 using Orchard.Localization;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using VirtoCommerce.Webshop.Models;
@@ -11,17 +14,15 @@ namespace VirtoCommerce.Webshop.Drivers
 {
     public class ProductListDriver : ContentPartDriver<ProductListPart>
     {
-        private const string StoreId = "SampleStore";
-        private const string Culture = "en-US";
-        private const string CatalogId = "VendorVirtual";
-        private const string Currency = "USD";
-        private const int PageSize = 20;
-
+        private readonly IOrchardServices _orchardServices;
         private readonly ICatalogService _catalogService;
         private readonly IPriceService _priceService;
 
-        public ProductListDriver(ICatalogService catalogService, IPriceService priceService)
+        private const int PageSize = 18;
+
+        public ProductListDriver(IOrchardServices orchardServices, ICatalogService catalogService, IPriceService priceService)
         {
+            _orchardServices = orchardServices;
             _catalogService = catalogService;
             _priceService = priceService;
 
@@ -32,39 +33,35 @@ namespace VirtoCommerce.Webshop.Drivers
 
         protected override DriverResult Display(ProductListPart part, string displayType, dynamic shapeHelper)
         {
+            var settings = _orchardServices.WorkContext.CurrentSite.As<WebshopSettingsPart>();
             var httpRequest = HttpContext.Current.Request;
 
             string categorySlug = null;
-            int page = 1;
             if (httpRequest.Url.Segments.Any(s => s.Equals("Category", StringComparison.OrdinalIgnoreCase)))
             {
-                categorySlug = httpRequest.QueryString["slug"];
-
-                if (httpRequest.QueryString["p"] != null)
-                {
-                    int.TryParse(httpRequest.QueryString["p"], out page);
-                }
+                categorySlug = httpRequest.QueryString["id"];
             }
 
-            PagedList<Product> productPagedList = null;
-
-            var pricelists = _priceService.GetPricelistsAsync(CatalogId, Currency).Result;
-
-            Category categoryModel = null;
-
-            if (!String.IsNullOrEmpty(categorySlug))
+            string categoryId = null;
+            if (!string.IsNullOrEmpty(categorySlug))
             {
-                categoryModel = _catalogService.GetCategoryAsync(StoreId, Culture, categorySlug).Result;
+                var categoryModel = _catalogService.GetCategoryAsync(settings.StoreId, settings.Culture, categorySlug).Result;
+                categoryId = categoryModel.Id;
             }
 
-            string categoryId = categoryModel != null ? categoryModel.Id : null;
+            int page = 1;
+            if (httpRequest.QueryString["p"] != null)
+            {
+                int.TryParse(httpRequest.QueryString["p"], out page);
+            }
 
-            productPagedList = _catalogService.SearchProductsAsync(StoreId, Culture, categoryId, (page - 1) * PageSize, PageSize, pricelists).Result;
+            var shopModel = _catalogService.GetShopsAsync().Result.FirstOrDefault(s => s.Id == settings.StoreId);
+            var pricelistIds = _priceService.GetPricelistsAsync(shopModel.CatalogId, shopModel.Currency).Result;
+
+            var productList = _catalogService.SearchProductsAsync(settings.StoreId, settings.Culture, categoryId, pricelistIds, (page - 1) * PageSize, PageSize).Result;
 
             return ContentShape("Parts_ProductList", () => shapeHelper.Parts_ProductList(
-                Category: categoryModel,
-                Products: productPagedList));
+                ProductList: productList));
         }
-
     }
 }

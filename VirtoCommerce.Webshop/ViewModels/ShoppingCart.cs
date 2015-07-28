@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using VirtoCommerce.Webshop.Converters;
 
 namespace VirtoCommerce.Webshop.ViewModels
@@ -18,25 +17,64 @@ namespace VirtoCommerce.Webshop.ViewModels
 
         public string Currency { get; set; }
 
-        public string Name { get; set; }
-
         public string StoreId { get; set; }
+
+        public string Culture { get; set; }
+
+        public string Name
+        {
+            get
+            {
+                return "default";
+            }
+        }
 
         public ICollection<LineItem> LineItems { get; private set; }
 
-        public ShoppingCart Add(Product product, int quantity)
+        public int LineItemCount
         {
-            var lineItem = LineItems.FirstOrDefault(li => li.Sku == product.Sku);
-            if (lineItem != null)
+            get
             {
-                lineItem.Quantity += quantity;
+                return LineItems.Count;
+            }
+        }
+
+        public decimal Subtotal
+        {
+            get
+            {
+                return LineItems.Sum(li => li.LinePrice);
+            }
+        }
+
+        public decimal Total
+        {
+            get
+            {
+                return Subtotal;
+            }
+        }
+
+        public void Add(LineItem lineItem)
+        {
+            var existingLineItem = LineItems.FirstOrDefault(li => li.ProductId == lineItem.ProductId);
+            if (existingLineItem != null)
+            {
+                existingLineItem.Quantity += lineItem.Quantity;
             }
             else
             {
-                LineItems.Add(product.ToLineItem(quantity));
+                LineItems.Add(lineItem);
             }
+        }
 
-            return this;
+        public void Remove(string lineItemId)
+        {
+            var lineItem = LineItems.FirstOrDefault(li => li.Id == lineItemId);
+            if (lineItem != null)
+            {
+                LineItems.Remove(lineItem);
+            }
         }
     }
 }

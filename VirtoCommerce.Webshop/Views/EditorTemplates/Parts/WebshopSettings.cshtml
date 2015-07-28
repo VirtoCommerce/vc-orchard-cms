@@ -14,36 +14,12 @@
         @Html.LabelFor(m => m.SecretKey, T("Secret key"))
         @Html.TextBoxFor(m => m.SecretKey, new { @class = "textMedium" })
     </div>
+    <div>
+        @Html.LabelFor(m => m.StoreId, T("Store ID"))
+        @Html.TextBoxFor(m => m.StoreId, new { @class = "textMedium" })
+    </div>
+    <div>
+        @Html.LabelFor(m => m.Culture, T("Culture"))
+        @Html.TextBoxFor(m => m.Culture, new { @class = "text-small" })
+    </div>
 </fieldset>
-<button id="btn-test-api" type="button">@T("Test API connection")</button>
-
-<script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>
-<script>
-    $(function () {
-        var btnTestApi = $("#btn-test-api");
-
-        btnTestApi.on("click", function () {
-            btnTestApi.text("@T("Please wait...")");
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("TestApiConnection", new { controller = "WebshopSettings", area = "VirtoCommerce.Webshop" })",
-                data: {
-                    apiUrl: $("#WebshopSettings_ApiUrl").val(),
-                    appId: $("#WebshopSettings_AppId").val(),
-                    secretKey: $("#WebshopSettings_SecretKey").val(),
-                    __RequestVerificationToken: "@Html.AntiForgeryTokenValueOrchard()"
-                },
-                success: function (jsonResult) {
-                    btnTestApi.text("@T("Test API connection")");
-                    if (jsonResult) {
-                        alert(jsonResult);
-                    }
-                },
-                error: function () {
-                    btnTestApi.text("@T("Test API connection")");
-                    alert("@T("Something bad happened =(")");
-                }
-            });
-        });
-    });
-</script>

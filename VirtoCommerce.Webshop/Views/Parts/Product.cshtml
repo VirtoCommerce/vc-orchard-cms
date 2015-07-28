@@ -1,7 +1,46 @@
-﻿@Model.Product.Name
-
-<input id="product-sku" type="hidden" value="@Model.Product.Sku" />
-<button id="btn-add-to-cart" type="button">@T("Add to cart")</button>
+﻿<div class="ws-product-images">
+    <div class="ws-box">
+        <div class="ws-primary">
+            <img alt="@Model.Product.Name" src="@Model.Product.ImageUrl" />
+        </div>
+        @if (Model.Product.Images.Count > 0)
+        {
+            <div class="ws-thumbs">
+                <ul class="ws-thumbs-list">
+                    @foreach (var imageSrc in Model.Product.Images)
+                    {
+                        <li>
+                            <a href="#">
+                                <img alt="@Model.Product.Name" src="@imageSrc" />
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+</div>
+<div class="ws-product-content">
+    <div class="ws-box">
+        <div class="ws-tab-content">
+            <div class="ws-details">
+                <input id="product-slug" type="hidden" value="@Model.Product.Slug" />
+                <h1>@Model.Product.Name</h1>
+                <div class="ws-prices">
+                    <span class="ws-price">$@Model.Product.Price.Original</span>
+                </div>
+            </div>
+            <div class="ws-description">
+                <p>
+                    @Model.Product.Description
+                </p>
+            </div>
+            <div class="ws-add-to-cart">
+                <button class="ws-btn ws-btn-primary ws-btn-lg ws-btn-block-xs" id="btn-add-to-cart">@T("Add to cart")</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>
 <script>
@@ -11,8 +50,8 @@
                 type: "POST",
                 url: "@Url.Action("Add", new { controller = "ShoppingCart", area = "VirtoCommerce.Webshop" })",
                 data: {
-                    sku: $("#product-sku").val(),
-                    quantity: 1,
+                    slug: $("#product-slug").val(),
+                    q: 1,
                     __RequestVerificationToken: "@Html.AntiForgeryTokenValueOrchard()"
                 },
                 success: function (jsonResult) {
@@ -20,7 +59,7 @@
                         if (jsonResult.errorMessage) {
                             alert(jsonResult.errorMessage);
                         } else {
-                            $(".ws-mini-cart a > span").text(jsonResult);
+                            $(".ws-mini-cart a").html("<span>" + jsonResult.shoppingCart.LineItemCount + "</span>");
                         }
                     }
                 }

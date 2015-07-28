@@ -1,22 +1,23 @@
 ﻿using Orchard;
+using Orchard.ContentManagement;
 using Orchard.ContentManagement.Drivers;
 using Orchard.Localization;
+using System.Web;
 using VirtoCommerce.Webshop.Models;
 using VirtoCommerce.Webshop.Services;
+using VirtoCommerce.Webshop.ViewModels;
 
 namespace VirtoCommerce.Webshop.Drivers
 {
     public class ShoppingCartPreviewDriver : ContentPartDriver<ShoppingCartPreviewPart>
     {
-        private const string StoreId = "SampleStore";
-
         private readonly IOrchardServices _orchardServices;
         private readonly IShoppingCartService _shoppingCartService;
 
-        public ShoppingCartPreviewDriver(IOrchardServices orchardServices, IShoppingCartService shoppingCartService)
+        public ShoppingCartPreviewDriver(IOrchardServices orchardServices, IShoppingCartService shoppingCartservice)
         {
             _orchardServices = orchardServices;
-            _shoppingCartService = shoppingCartService;
+            _shoppingCartService = shoppingCartservice;
 
             T = NullLocalizer.Instance;
         }
@@ -25,18 +26,23 @@ namespace VirtoCommerce.Webshop.Drivers
 
         protected override DriverResult Display(ShoppingCartPreviewPart part, string displayType, dynamic shapeHelper)
         {
-            var currentUser = _orchardServices.WorkContext.CurrentUser;
+            var settings = _orchardServices.WorkContext.CurrentSite.As<WebshopSettingsPart>();
 
-            int lineItemCount = 0;
-
-            var shoppingCart = _shoppingCartService.GetShoppingCartAsync(StoreId, currentUser.UserName).Result;
-            if (shoppingCart != null)
+            string customerId = null;
+            var anonymousCookie = HttpContext.Current.Request.Cookies[settings.AnonymousCookieId];
+            if (anonymousCookie != null)
             {
-                lineItemCount = shoppingCart.LineItems.Count;
+                customerId = anonymousCookie.Value;
+            }
+
+            ShoppingCart shoppingCart = null;
+            if (!string.IsNullOrEmpty(customerId))
+            {
+                shoppingCart = _shoppingCartService.GetShoppingCartAsync(settings.StoreId, customerId).Result;
             }
 
             return ContentShape("Parts_ShoppingCartPreview", () => shapeHelper.Parts_ShoppingCartPreview(
-                lineItemCount: lineItemCount));
+                ShoppingCart: shoppingCart));
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using VirtoCommerce.Webshop.Client;
 using VirtoCommerce.Webshop.Converters;
@@ -15,61 +16,80 @@ namespace VirtoCommerce.Webshop.Services
             _apiClient = apiClient;
         }
 
-        public async Task<ShoppingCart> GetShoppingCartAsync(string storeId, string customerId)
-        {
-            ShoppingCart shoppingCartModel = null;
-
-            var apiRequest = new ApiGetRequest
-            {
-                CustomerId = customerId,
-                StoreId = storeId
-            };
-
-            var apiResponse = await _apiClient.GetShoppingCartAsync(apiRequest).ConfigureAwait(false);
-            if (apiResponse != null)
-            {
-                if (apiResponse.Error != null)
-                {
-                    // TODO: Do something with errors
-                    throw new Exception(apiResponse.Error.StackTrace);
-                }
-                if (apiResponse.Content != null)
-                {
-                    return apiResponse.Content.ToViewModel();
-                }
-            }
-
-            return shoppingCartModel;
-        }
-
         public async Task CreateShoppingCartAsync(ShoppingCart shoppingCart)
         {
-            var apiResponse = await _apiClient.CreateShoppingCartAsync(shoppingCart.ToApiModel());
-            if (apiResponse.Error != null)
-            {
-                // TODO: Do something with errors
-                throw new Exception(apiResponse.Error.StackTrace);
-            }
-        }
+            var shoppingCartModel = shoppingCart.ToApiModel();
 
-        public async Task UpdateShoppingCartAsync(ShoppingCart shoppingCart)
-        {
-            var apiResponse = await _apiClient.UpdateShoppingCartAsync(shoppingCart.ToApiModel());
-            if (apiResponse.Error != null)
-            {
-                // TODO: Do something with errors
-                throw new Exception(apiResponse.Error.StackTrace);
-            }
+            await _apiClient.CartClient.CreateCartAsync(shoppingCartModel).ConfigureAwait(false);
         }
 
         public async Task DeleteShoppingCartAsync(string shoppingCartId)
         {
-            var apiResponse = await _apiClient.DeleteShoppingCartAsync(new[] { shoppingCartId });
-            if (apiResponse.Error != null)
+            await _apiClient.CartClient.DeleteCartAsync(new[] { shoppingCartId }).ConfigureAwait(false);
+        }
+
+        public async Task<ShoppingCart> GetShoppingCartAsync(string storeId, string customerId)
+        {
+            var apiResponse = await _apiClient.CartClient.GetCartAsync(storeId, customerId).ConfigureAwait(false);
+
+            if (apiResponse == null)
             {
-                // TODO: Do something with errors
-                throw new Exception(apiResponse.Error.StackTrace);
+                return null;
             }
+
+            return apiResponse.ToViewModel();
+        }
+
+        public async Task UpdateShoppingCartAsync(ShoppingCart shoppingCart, Checkout checkout)
+        {
+            var shoppingCartModel = shoppingCart.ToApiModel();
+
+            if (checkout != null)
+            {
+                shoppingCartModel = shoppingCart.ToApiModel(checkout);
+            }
+
+            await _apiClient.CartClient.UpdateCurrentCartAsync(shoppingCartModel).ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<ShippingMethod>> GetShippingMethodsAsync(string shoppingCartId)
+        {
+            var apiResponse = await _apiClient.CartClient.GetCartShippingMethods(shoppingCartId).ConfigureAwait(false);
+
+            if (apiResponse == null)
+            {
+                return null;
+            }
+
+            return apiResponse.Select(r => r.ToViewModel());
+        }
+
+        public async Task<IEnumerable<PaymentMethod>> GetPaymentMethodsAsync(string shoppingCartId)
+        {
+            var apiResponse = await _apiClient.CartClient.GetCartPaymentMethods(shoppingCartId).ConfigureAwait(false);
+
+            if (apiResponse == null)
+            {
+                return null;
+            }
+
+            return apiResponse.Select(r => r.ToViewModel());
+        }
+
+        public async Task<Checkout> GetCheckoutAsync(string storeId, string customerId)
+        {
+            Checkout checkoutModel = null;
+
+            var shoppingCart = await _apiClient.CartClient.GetCartAsync(storeId, customerId).ConfigureAwait(false);
+            if (shoppingCart != null)
+            {
+                var paymentMethodModels = await GetPaymentMethodsAsync(shoppingCart.Id).ConfigureAwait(false);
+                var shippingMethodModels = await GetShippingMethodsAsync(shoppingCart.Id).ConfigureAwait(false);
+
+                checkoutModel = shoppingCart.ToViewModel(paymentMethodModels, shippingMethodModels);
+            }
+
+            return checkoutModel;
         }
     }
 }

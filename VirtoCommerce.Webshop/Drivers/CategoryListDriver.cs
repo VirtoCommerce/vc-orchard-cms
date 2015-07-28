@@ -1,8 +1,9 @@
-﻿using Orchard.ContentManagement.Drivers;
+﻿using Orchard;
+using Orchard.ContentManagement;
+using Orchard.ContentManagement.Drivers;
 using Orchard.Localization;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Web;
 using VirtoCommerce.Webshop.Models;
 using VirtoCommerce.Webshop.Services;
@@ -11,33 +12,33 @@ namespace VirtoCommerce.Webshop.Drivers
 {
     public class CategoryListDriver : ContentPartDriver<CategoryListPart>
     {
-        private const string StoreId = "SampleStore";
-        private const string Culture = "en-US";
-
+        private readonly IOrchardServices _orchardServices;
         private readonly ICatalogService _catalogService;
 
-        public CategoryListDriver(ICatalogService catalogService)
+        public CategoryListDriver(IOrchardServices orchardServices, ICatalogService catalogService)
         {
+            _orchardServices = orchardServices;
             _catalogService = catalogService;
-
-            T = NullLocalizer.Instance;
         }
 
         public Localizer T { get; set; }
 
         protected override DriverResult Display(CategoryListPart part, string displayType, dynamic shapeHelper)
         {
-            var categoryModels = _catalogService.GetCategoriesAsync(StoreId, Culture).Result;
+            var settings = _orchardServices.WorkContext.CurrentSite.As<WebshopSettingsPart>();
+            var httpRequest = HttpContext.Current.Request;
+
+            var categories = _catalogService.GetCategoriesAsync(settings.StoreId, settings.Culture).Result;
 
             string categorySlug = null;
-            if (HttpContext.Current.Request.Url.Segments.Any(s => s.Equals("Category", StringComparison.OrdinalIgnoreCase)))
+            if (httpRequest.Url.Segments.Any(s => s.Equals("Category", StringComparison.OrdinalIgnoreCase)))
             {
-                categorySlug = HttpContext.Current.Request.QueryString["slug"];
+                categorySlug = httpRequest.QueryString["id"];
             }
 
             return ContentShape("Parts_CategoryList", () => shapeHelper.Parts_CategoryList(
                 CategorySlug: categorySlug,
-                Categories: categoryModels));
+                Categories: categories));
         }
     }
 }

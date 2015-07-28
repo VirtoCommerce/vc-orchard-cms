@@ -4,31 +4,30 @@
     {
         public string Id { get; set; }
 
-        public string ProductId { get; set; }
+        public string CatalogId { get; set; }
 
-        public string Name { get; set; }
+        public string CategoryId { get; set; }
+
+        public string ProductId { get; set; }
 
         public string Sku { get; set; }
 
+        public string Name { get; set; }
+
         public Price Price { get; set; }
-
-        public int Quantity { get; set; }
-
-        public string ImageUrl { get; set; }
 
         public decimal LinePrice
         {
             get
             {
-                decimal price = 0M;
-
-                if (Price != null)
-                {
-                    price = Price.Actual;
-                }
-
-                return price * Quantity;
+                return Price != null ? Price.Original * Quantity : 0M;
             }
         }
+
+        public int Quantity { get; set; }
+
+        public string ImageUrl { get; set; }
+
+        public string Currency { get; set; }
     }
 }

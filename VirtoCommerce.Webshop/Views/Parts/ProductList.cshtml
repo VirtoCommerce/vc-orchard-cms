@@ -1,12 +1,7 @@
-﻿@{
-    Style.Require("LatoFont");
-    Style.Require("Webshop");
-}
-
-<ul class="ws-product-list" id="isotope-content">
-    @foreach (var product in Model.Products)
+﻿<ul class="ws-product-list" id="isotope-content">
+    @foreach (var product in Model.ProductList)
     {
-        <li>
+        <li class="ws-product-item">
             <a href="@Href(String.Format(product.UrlPattern, product.Slug))" title="@product.Name">
                 <div class="ws-image">
                     <img alt="@product.Name" src="@product.ImageUrl" />
@@ -33,3 +28,11 @@
         </li>
     }
 </ul>
+
+<script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/masonry/3.3.1/masonry.pkgd.min.js"></script>
+<script>
+    $(".ws-product-list").masonry({
+        itemSelector: ".ws-product-item"
+    });
+</script>

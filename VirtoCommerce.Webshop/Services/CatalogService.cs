@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DataContracts = VirtoCommerce.ApiClient.DataContracts;
 using VirtoCommerce.Webshop.Client;
 using VirtoCommerce.Webshop.Converters;
 using VirtoCommerce.Webshop.ViewModels;
@@ -19,31 +19,32 @@ namespace VirtoCommerce.Webshop.Services
             _priceService = priceService;
         }
 
+        public async Task<IEnumerable<Shop>> GetShopsAsync()
+        {
+            var apiResponse = await _apiClient.StoreClient.GetStoresAsync().ConfigureAwait(false);
+
+            if (apiResponse == null)
+            {
+                return null;
+            }
+
+            return apiResponse.Select(s => s.ToViewModel());
+        }
+
         public async Task<IEnumerable<Category>> GetCategoriesAsync(string storeId, string culture)
         {
+            var apiResponse = await _apiClient.BrowseClient.GetCategoriesAsync(storeId, culture).ConfigureAwait(false);
+
+            if (apiResponse == null)
+            {
+                return null;
+            }
+
             var categoryModels = new List<Category>();
 
-            var apiRequest = new ApiGetRequest
+            foreach (var category in apiResponse.Items)
             {
-                Culture = culture,
-                StoreId = storeId
-            };
-
-            var apiResponse = await _apiClient.GetCategoriesAsync(apiRequest).ConfigureAwait(false);
-            if (apiResponse != null)
-            {
-                if (apiResponse.Error != null)
-                {
-                    // TODO: Do something with errors
-                    throw new Exception(apiResponse.Error.StackTrace);
-                }
-                if (apiResponse.Content != null)
-                {
-                    foreach (var category in apiResponse.Content.Items)
-                    {
-                        categoryModels.Add(category.ToViewModel());
-                    }
-                }
+                categoryModels.Add(category.ToViewModel());
             }
 
             return categoryModels;
@@ -51,159 +52,61 @@ namespace VirtoCommerce.Webshop.Services
 
         public async Task<Category> GetCategoryAsync(string storeId, string culture, string slug)
         {
-            Category categoryModel = null;
+            var apiResponse = await _apiClient.BrowseClient.GetCategoryByKeywordAsync(storeId, culture, slug).ConfigureAwait(false);
 
-            var apiRequest = new ApiGetRequest
+            if (apiResponse == null)
             {
-                Culture = culture,
-                Keyword = slug,
-                StoreId = storeId
-            };
-
-            var apiResponse = await _apiClient.GetCategoryAsync(apiRequest).ConfigureAwait(false);
-            if (apiResponse != null)
-            {
-                if (apiResponse.Error != null)
-                {
-                    // TODO: Do something with errors
-                    throw new Exception(apiResponse.Error.StackTrace);
-                }
-                if (apiResponse.Content != null)
-                {
-                    categoryModel = apiResponse.Content.ToViewModel();
-                }
+                return null;
             }
 
-            return categoryModel;
+            return apiResponse.ToViewModel();
         }
 
-        public async Task<PagedList<Product>> SearchProductsAsync(string storeId, string culture, string categorySlug, int skip, int take, IEnumerable<string> pricelists)
+        public async Task<PagedList<Product>> SearchProductsAsync(string storeId, string culture, string categorySlug, IEnumerable<string> pricelistIds, int skip, int take)
         {
-            PagedList<Product> productPagedList = null;
-
-            var apirequest = new ApiGetRequest
+            var browseQuery = new DataContracts.BrowseQuery
             {
-                Culture = culture,
                 Outline = categorySlug,
-                PricelistIds = pricelists,
+                PriceLists = pricelistIds.ToArray(),
                 Skip = skip,
-                Take = take,
-                ResponseGroup = 102,
-                StoreId = storeId
+                Take = take
             };
 
-            var apiResponse = await _apiClient.SearchProductsAsync(apirequest).ConfigureAwait(false);
-            if (apiResponse != null)
+            var apiResponse = await _apiClient.BrowseClient.GetProductsAsync(storeId, culture, browseQuery, DataContracts.ItemResponseGroups.ItemMedium).ConfigureAwait(false);
+
+            if (apiResponse == null)
             {
-                if (apiResponse.Error != null)
-                {
-                    // TODO: Do something with errors
-                    throw new Exception(apiResponse.Error.StackTrace);
-                }
-                if (apiResponse.Content != null)
-                {
-                    var productIds = apiResponse.Content.Items.Select(i => i.Id).ToList();
-                    foreach (var product in apiResponse.Content.Items)
-                    {
-                        if (product.Variations != null)
-                        {
-                            productIds.AddRange(product.Variations.Select(v => v.Id));
-                        }
-                    }
-
-                    var priceModels = await _priceService.GetPricesAsync(pricelists, productIds);
-
-                    var productModels = new List<Product>();
-                    foreach (var product in apiResponse.Content.Items)
-                    {
-                        var priceModel = priceModels.FirstOrDefault(p => p.ProductId.Equals(product.Id));
-
-                        productModels.Add(product.ToViewModel(priceModel));
-                    }
-
-                    productPagedList = new PagedList<Product>(productModels, take, apiResponse.Content.Total);
-                }
+                return null;
             }
 
-            return productPagedList;
+            int pageIndex = skip / take + 1;
+
+            var productIds = apiResponse.Items.Select(i => i.Id);
+
+            var priceModels = await _priceService.GetPricesAsync(pricelistIds, productIds).ConfigureAwait(false);
+
+            var productModels = apiResponse.Items.Select(i => i.ToViewModel(priceModels.FirstOrDefault(p => p.ProductId == i.Id)));
+
+            return new PagedList<Product>(productModels, pageIndex, take, apiResponse.TotalCount);
         }
 
-        public async Task<Product> GetProductBySlugAsync(string storeId, string culture, string pricelistId, string slug)
+        public async Task<Product> GetProductAsync(string storeId, string culture, string slug)
         {
-            Product productModel = null;
+            var apiResponse = await _apiClient.BrowseClient.GetProductByKeywordAsync(storeId, culture, slug).ConfigureAwait(false);
 
-            var apiRequest = new ApiGetRequest
+            if (apiResponse == null)
             {
-                Culture = culture,
-                Keyword = slug,
-                StoreId = storeId
-            };
-
-            var apiResponse = await _apiClient.GetProductAsync(apiRequest).ConfigureAwait(false);
-            if (apiResponse != null)
-            {
-                if (apiResponse.Error != null)
-                {
-                    // TODO: Do something with errors
-                    throw new Exception(apiResponse.Error.StackTrace);
-                }
-                if (apiResponse.Content != null)
-                {
-                    var productIds = new List<string>();
-                    productIds.Add(apiResponse.Content.Id);
-
-                    if (apiResponse.Content.Variations != null)
-                    {
-                        productIds.AddRange(apiResponse.Content.Variations.Select(v => v.Id));
-                    }
-
-                    var priceModels = await _priceService.GetPricesAsync(new[] { pricelistId }, productIds).ConfigureAwait(false);
-                    var productPriceModel = priceModels.FirstOrDefault(p => p.ProductId == apiResponse.Content.Id);
-
-                    productModel = apiResponse.Content.ToViewModel(productPriceModel);
-                }
+                return null;
             }
 
-            return productModel;
-        }
+            var stores = await _apiClient.StoreClient.GetStoresAsync().ConfigureAwait(false);
+            var store = stores.FirstOrDefault(s => s.Id == storeId);
 
-        public async Task<Product> GetProductBySkuAsync(string storeId, string culture, string pricelistId, string sku)
-        {
-            Product productModel = null;
+            var pricelistIds = await _priceService.GetPricelistsAsync(store.Catalog, store.DefaultCurrency).ConfigureAwait(false);
 
-            var apiRequest = new ApiGetRequest
-            {
-                Culture = culture,
-                Code = sku,
-                StoreId = storeId
-            };
+            var priceModels = await _priceService.GetPricesAsync(pricelistIds, new[] { apiResponse.Id }).ConfigureAwait(false);
 
-            var apiResponse = await _apiClient.GetProductAsync(apiRequest).ConfigureAwait(false);
-            if (apiResponse != null)
-            {
-                if (apiResponse.Error != null)
-                {
-                    // TODO: Do something with errors
-                    throw new Exception(apiResponse.Error.StackTrace);
-                }
-                if (apiResponse.Content != null)
-                {
-                    var productIds = new List<string>();
-                    productIds.Add(apiResponse.Content.Id);
-
-                    if (apiResponse.Content.Variations != null)
-                    {
-                        productIds.AddRange(apiResponse.Content.Variations.Select(v => v.Id));
-                    }
-
-                    var priceModels = await _priceService.GetPricesAsync(new[] { pricelistId }, productIds).ConfigureAwait(false);
-                    var productPriceModel = priceModels.FirstOrDefault(p => p.ProductId == apiResponse.Content.Id);
-
-                    productModel = apiResponse.Content.ToViewModel(productPriceModel);
-                }
-            }
-
-            return productModel;
+            return apiResponse.ToViewModel(priceModels.FirstOrDefault(p => p.ProductId == apiResponse.Id));
         }
     }
 }

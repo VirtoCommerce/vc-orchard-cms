@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using DataContracts = VirtoCommerce.ApiClient.DataContracts;
 using VirtoCommerce.Webshop.Client;
 using VirtoCommerce.Webshop.Converters;
 using VirtoCommerce.Webshop.ViewModels;
@@ -18,59 +19,21 @@ namespace VirtoCommerce.Webshop.Services
 
         public async Task<IEnumerable<string>> GetPricelistsAsync(string catalogId, string currency)
         {
-            IEnumerable<string> pricelists = null;
+            var pricelistIds = await _apiClient.PriceClient.GetPriceListsAsync(catalogId, currency, new DataContracts.TagQuery()).ConfigureAwait(false);
 
-            var apiRequest = new ApiGetRequest
-            {
-                CatalogId = catalogId,
-                Currency = currency
-            };
-
-            var apiResponse = await _apiClient.GetPricelistsAsync(apiRequest).ConfigureAwait(false);
-            if (apiResponse != null)
-            {
-                if (apiResponse.Error != null)
-                {
-                    // TODO: Do something with errors
-                    throw new Exception(apiResponse.Error.StackTrace);
-                }
-                if (apiResponse.Content != null)
-                {
-                    pricelists = apiResponse.Content;
-                }
-            }
-
-            return pricelists;
+            return pricelistIds;
         }
 
-        public async Task<IEnumerable<Price>> GetPricesAsync(IEnumerable<string> pricelists, IEnumerable<string> productIds)
+        public async Task<IEnumerable<Price>> GetPricesAsync(IEnumerable<string> pricelistIds, IEnumerable<string> productIds)
         {
-            var priceModels = new List<Price>();
+            var apiResponse = await _apiClient.PriceClient.GetPrices(pricelistIds.ToArray(), productIds.ToArray(), false).ConfigureAwait(false);
 
-            var apiRequest = new ApiGetRequest
+            if (apiResponse == null)
             {
-                PricelistIds = pricelists,
-                ProductIds = productIds
-            };
-
-            var apiResponse = await _apiClient.GetPricesAsync(apiRequest);
-            if (apiResponse != null)
-            {
-                if (apiResponse.Error != null)
-                {
-                    // TODO: Do something with errors
-                    throw new Exception(apiResponse.Error.StackTrace);
-                }
-                if (apiResponse.Content != null)
-                {
-                    foreach (var price in apiResponse.Content)
-                    {
-                        priceModels.Add(price.ToViewModel());
-                    }
-                }
+                return null;
             }
 
-            return priceModels;
+            return apiResponse.Select(p => p.ToViewModel());
         }
     }
 }

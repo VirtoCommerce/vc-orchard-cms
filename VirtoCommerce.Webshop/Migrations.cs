@@ -53,5 +53,38 @@ namespace VirtoCommerce.Webshop {
 
             return 4;
         }
+
+        public int UpdateFrom4()
+        {
+            ContentDefinitionManager.AlterTypeDefinition("ShoppingCartWidget", cfg => cfg
+                .WithPart("ShoppingCartPart")
+                .WithPart("WidgetPart")
+                .WithPart("CommonPart")
+                .WithSetting("Stereotype", "Widget"));
+
+            return 5;
+        }
+
+        public int UpdateFrom5()
+        {
+            ContentDefinitionManager.AlterTypeDefinition("CheckoutWidget", cfg => cfg
+                .WithPart("CheckoutPart")
+                .WithPart("WidgetPart")
+                .WithPart("CommonPart")
+                .WithSetting("Stereotype", "Widget"));
+
+            return 6;
+        }
+
+        public int UpdateFrom6()
+        {
+            ContentDefinitionManager.AlterTypeDefinition("ThanksWidget", cfg => cfg
+                .WithPart("ThanksPart")
+                .WithPart("WidgetPart")
+                .WithPart("CommonPart")
+                .WithSetting("Stereotype", "Widget"));
+
+            return 7;
+        }
     }
 }

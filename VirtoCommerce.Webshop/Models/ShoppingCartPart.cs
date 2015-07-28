@@ -1,6 +1,8 @@
-﻿namespace VirtoCommerce.Webshop.Models
+﻿using Orchard.ContentManagement;
+
+namespace VirtoCommerce.Webshop.Models
 {
-    public class ShoppingCartPart
+    public class ShoppingCartPart : ContentPart
     {
     }
 }

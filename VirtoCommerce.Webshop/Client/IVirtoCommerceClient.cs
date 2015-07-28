@@ -1,39 +1,18 @@
 ﻿using Orchard;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using VirtoCommerce.Webshop.Client.DataContracts;
-using VirtoCommerce.Webshop.Client.DataContracts.Cart;
-using VirtoCommerce.Webshop.Client.DataContracts.Order;
+using VirtoCommerce.ApiClient;
 
 namespace VirtoCommerce.Webshop.Client
 {
     public interface IVirtoCommerceClient : IDependency
     {
-        Task<string> TestApiConnectionAsync(string apiUrl, string appId, string secretKey);
+        StoreClient StoreClient { get; }
 
-        Task<ApiResponse<IEnumerable<Store>>> GetStoresAsync();
+        BrowseClient BrowseClient { get; }
 
-        Task<ApiResponse<ResponseCollection<Category>>> GetCategoriesAsync(ApiGetRequest request);
+        PriceClient PriceClient { get; }
 
-        Task<ApiResponse<Category>> GetCategoryAsync(ApiGetRequest request);
+        CartClient CartClient { get; }
 
-        Task<ApiResponse<ProductSearchResult>> SearchProductsAsync(ApiGetRequest request);
-
-        Task<ApiResponse<Product>> GetProductAsync(ApiGetRequest request);
-
-        Task<ApiResponse<IEnumerable<string>>> GetPricelistsAsync(ApiGetRequest request);
-
-        Task<ApiResponse<IEnumerable<Price>>> GetPricesAsync(ApiGetRequest request);
-
-        Task<ApiResponse<object>> CreateShoppingCartAsync(ShoppingCart shoppingCart);
-
-        Task<ApiResponse<ShoppingCart>> GetShoppingCartAsync(ApiGetRequest request);
-
-        Task<ApiResponse<object>> UpdateShoppingCartAsync(ShoppingCart shoppingCart);
-
-        Task<ApiResponse<Object>> DeleteShoppingCartAsync(IEnumerable<string> shoppingCartIds);
-
-        void Dispose();
+        OrderClient OrderClient { get; }
     }
 }

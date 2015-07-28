@@ -1,11 +1,9 @@
 ﻿using Orchard.ContentManagement;
-using System.ComponentModel.DataAnnotations;
 
 namespace VirtoCommerce.Webshop.Models
 {
     public class WebshopSettingsPart : ContentPart
     {
-        [Required]
         public string ApiUrl
         {
             get
@@ -18,7 +16,6 @@ namespace VirtoCommerce.Webshop.Models
             }
         }
 
-        [Required]
         public string AppId
         {
             get
@@ -31,7 +28,6 @@ namespace VirtoCommerce.Webshop.Models
             }
         }
 
-        [Required]
         public string SecretKey
         {
             get
@@ -41,6 +37,38 @@ namespace VirtoCommerce.Webshop.Models
             set
             {
                 this.Store(x => x.SecretKey, value);
+            }
+        }
+
+        public string StoreId
+        {
+            get
+            {
+                return this.Retrieve(x => x.StoreId);
+            }
+            set
+            {
+                this.Store(x => x.StoreId, value);
+            }
+        }
+
+        public string Culture
+        {
+            get
+            {
+                return this.Retrieve(x => x.Culture);
+            }
+            set
+            {
+                this.Store(x => x.Culture, value);
+            }
+        }
+
+        public string AnonymousCookieId
+        {
+            get
+            {
+                return "vcf.AnonymousId";
             }
         }
     }

@@ -7,9 +7,14 @@
     @foreach (var category in Model.Categories)
     {
         <li>
-            <a class="@(category.Slug == Model.CategorySlug ? "ws-selected" : String.Empty)" href="@Href(String.Format(category.UrlPattern, category.Slug))">
-                @category.Name
-            </a>
+            @if (category.Slug == Model.CategorySlug)
+            {
+                <a class="ws-selected" href="@Href(String.Format(category.UrlPattern, category.Slug))">@category.Name</a>
+            }
+            else
+            {
+                <a href="@Href(String.Format(category.UrlPattern, category.Slug))">@category.Name</a>
+            }
         </li>
     }
 </ul>
