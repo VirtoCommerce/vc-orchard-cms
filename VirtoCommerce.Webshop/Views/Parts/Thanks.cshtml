@@ -1,0 +1,14 @@
+﻿<h2>@T("Thank you!")</h2>
+<p>@T("Order number"): @Model.Order.OrderNumber</p>
+<p>
+    @T("Financial status"): @Model.FinancialStatus
+</p>
+<p>
+    @T("Order items"):
+    <ul>
+        @foreach (var lineItem in Model.Order.LineItems)
+        {
+            <li>@lineItem.Name</li>
+        }
+    </ul>
+</p>

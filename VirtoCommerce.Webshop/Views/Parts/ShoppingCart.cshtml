@@ -1,0 +1,145 @@
+﻿<div class="ws-cart-content">
+    <div class="ws-box">
+        <div class="ws-box-header">
+            <h3>@T("Shopping cart")</h3>
+            <h5>@T("You currently have") <strong>@Model.ShoppingCart.LineItemCount</strong> @T("item(s) in your cart")</h5>
+        </div>
+        <div class="ws-box-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>@T("Product")</th>
+                        <th>@T("Qty")</th>
+                        <th>@T("Single")</th>
+                        <th>@T("Total")</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody class="ws-cart-items">
+                    @foreach (var lineItem in Model.ShoppingCart.LineItems)
+                    {
+                        <tr>
+                            <td class="ws-col-product">
+                                <div class="ws-image">
+                                    <a href="#">
+                                        <img alt="@lineItem.Name" src="@lineItem.ImageUrl" />
+                                    </a>
+                                </div>
+                                <h5>
+                                    <a href="#">@lineItem.Name</a>
+                                </h5>
+                            </td>
+                            <td>
+                                <input class="ws-input-sm" data-item-id="@lineItem.Id" type="text" value="@lineItem.Quantity" />
+                            </td>
+                            <td>
+                                <span class="ws-price">$@lineItem.Price.Original.ToString("#.00")</span>
+                            </td>
+                            <td>
+                                <span class="ws-price">$@lineItem.LinePrice.ToString("#.00")</span>
+                            </td>
+                            <td class="ws-remove-item">
+                                <a data-item-id="@lineItem.Id" href="#">Remove</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="ws-box-footer">
+            <a class="ws-btn ws-btn-primary ws-btn-lg" href="@Href("~/Checkout")">@T("Proceed to checkout")</a>
+        </div>
+    </div>
+</div>
+<div class="ws-cart-info">
+    <div class="ws-cart-details">
+        <div class="ws-box">
+            <div class="ws-box-header">
+                <h3>@T("Order totals")</h3>
+                <h5>@T("Shipping costs and taxes will be evaluated durind checkout")</h5>
+            </div>
+            <ul class="ws-price-list">
+                <li>
+                    @T("Subtotal"):
+                    <strong>$@Model.ShoppingCart.Subtotal.ToString("#.00")</strong>
+                </li>
+                <li class="ws-important">
+                    @T("Total"):
+                    <strong>$@Model.ShoppingCart.Total.ToString("#.00")</strong>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>
+<script>
+    Array.prototype.getElementByVal = function (propName, propValue) {
+        var el = null;
+        for (var i = 0; i < this.length; i++) {
+            if (this[i][propName] == propValue) {
+                el = this[i];
+                break;
+            }
+        }
+        return el;
+    }
+
+    $(function () {
+        $(".ws-cart-items input").on("blur", function () {
+            var lineItemId = $(this).data("item-id");
+            var quantity = $(this).val();
+            var that = $(this);
+            $.ajax({
+                type: "POST",
+                cache: false,
+                url: "@Url.Action("Change", new { controller = "ShoppingCart", area = "VirtoCommerce.Webshop" })",
+                data: {
+                    lineItemId: lineItemId,
+                    quantity: quantity,
+                    __RequestVerificationToken: "@Html.AntiForgeryTokenValueOrchard()"
+                },
+                success: function (jsonResponse) {
+                    if (jsonResponse) {
+                        if (jsonResponse.errorMessage) {
+                            alert(jsonResponse.errorMessage);
+                        } else {
+                            var lineItem = jsonResponse.shoppingCart.LineItems.getElementByVal("Id", lineItemId);
+                            that.parents("tr").find(".ws-price:eq(1)").text("$" + lineItem.LinePrice);
+                            $(".ws-price-list li:eq(0) strong").text("$" + jsonResponse.shoppingCart.Subtotal);
+                            $(".ws-price-list li:eq(1) strong").text("$" + jsonResponse.shoppingCart.Total);
+                        }
+                    }
+                }
+            });
+        });
+
+        $(".ws-remove-item a").on("click", function () {
+            var lineItemId = $(this).data("item-id");
+            var that = $(this);
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("Remove", new { controller = "ShoppingCart", area = "VirtoCommerce.Webshop" })",
+                data: {
+                    lineItemId: lineItemId,
+                    __RequestVerificationToken: "@Html.AntiForgeryTokenValueOrchard()"
+                },
+                success: function (jsonResponse) {
+                    if (jsonResponse) {
+                        if (jsonResponse.errorMessage) {
+                            alert(jsonResponse.errorMessage);
+                        } else {
+                            if (jsonResponse.shoppingCart.LineItemCount == 0) {
+                                window.location.reload();
+                            }
+                            that.parents("tr").remove();
+                            $(".ws-price-list li:eq(0) strong").text("$" + jsonResponse.shoppingCart.Subtotal);
+                            $(".ws-price-list li:eq(1) strong").text("$" + jsonResponse.shoppingCart.Total);
+                            $(".ws-mini-cart span").text(jsonResponse.shoppingCart.LineItemCount);
+                        }
+                    }
+                }
+            });
+        });
+    });
+</script>

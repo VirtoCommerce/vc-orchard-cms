@@ -1,0 +1,174 @@
+﻿<div class="ws-cart-content">
+    @using (Html.BeginForm("Create", "Order", FormMethod.Post, new { @class = "ws-box" }))
+    {
+        <div class="ws-box">
+            <div class="ws-box-header">
+                <h3>@T("Address")</h3>
+                <h5>@T("Address will be setted for shipping and billing")</h5>
+            </div>
+            <div class="ws-box-content">
+                <div class="ws-column">
+                    <label>@T("FirstName")</label>
+                    <input id="Address_FirstName" name="Address.FirstName" type="text" value="@Model.Checkout.ShippingAddress.FirstName" />
+                    <label>@T("LastName")</label>
+                    <input id="Address_LastName" name="Address.LastName" type="text" value="@Model.Checkout.ShippingAddress.LastName" />
+                    <label>@T("Company")</label>
+                    <input id="Address_Company" name="Address.Company" type="text" value="@Model.Checkout.ShippingAddress.Company" />
+                    <label>@T("E-mail")</label>
+                    <input id="Address_Email" name="Address.Email" type="text" value="@Model.Checkout.ShippingAddress.Email" />
+                    <label>@T("Phone")</label>
+                    <input id="Address_Phone" name="Address.Phone" type="text" value="@Model.Checkout.ShippingAddress.Phone" />
+                </div>
+                <div class="ws-column">
+                    <label>@T("Country")</label>
+                    <input id="Address_Country" name="Address.Country" type="text" value="@Model.Checkout.ShippingAddress.Country" />
+                    <label>@T("Province")</label>
+                    <input id="Address_Province" name="Address.Province" type="text" value="@Model.Checkout.ShippingAddress.Province" />
+                    <label>@T("City")</label>
+                    <input id="Address_City" name="Address.City" type="text" value="@Model.Checkout.ShippingAddress.City" />
+                    <label>@T("Address")</label>
+                    <input id="Address_AddressLine1" name="Address.AddressLine1" type="text" value="@Model.Checkout.ShippingAddress.AddressLine1" />
+                    <label>@T("Postal code")</label>
+                    <input id="Address_PostalCode" name="Address.PostalCode" type="text" value="@Model.Checkout.ShippingAddress.PostalCode" />
+                </div>
+            </div>
+        </div>
+        <div class="ws-box">
+            <div class="ws-box-header">
+                <h3>@T("ShippingMethod")</h3>
+            </div>
+            <div class="ws-box-content">
+                @foreach (var shippingMethod in Model.Checkout.ShippingMethods)
+                {
+                    <input id="ShippingMethodId_@shippingMethod.Keyword" name="ShippingMethodId" type="radio" value="@shippingMethod.Keyword" /> @shippingMethod.Name
+                }
+            </div>
+        </div>
+        <div class="ws-box">
+            <div class="ws-box-header">
+                <h3>@T("PaymentMethod")</h3>
+            </div>
+            <div class="ws-box-content">
+                @foreach (var paymentMethod in Model.Checkout.PaymentMethods)
+                {
+                    <input id="PaymentMethodId_@paymentMethod.Keyword" name="PaymentMethodId" type="radio" value="@paymentMethod.Keyword" /> @paymentMethod.Name
+                }
+            </div>
+        </div>
+        <div class="ws-box">
+            <div class="ws-box-header">
+                <h3>@T("Items")</h3>
+            </div>
+            <div class="ws-box-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>@T("Product")</th>
+                            <th>@T("Qty")</th>
+                            <th>@T("Single")</th>
+                            <th>@T("Total")</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody class="ws-cart-items">
+                        @foreach (var lineItem in Model.Checkout.LineItems)
+                        {
+                            <tr>
+                                <td class="ws-col-product">
+                                    <div class="ws-image">
+                                        <a href="#">
+                                            <img alt="@lineItem.Name" src="@lineItem.ImageUrl" />
+                                        </a>
+                                    </div>
+                                    <h5>
+                                        <a href="#">@lineItem.Name</a>
+                                    </h5>
+                                </td>
+                                <td>
+                                    <span class="ws-price">@lineItem.Quantity</span>
+                                </td>
+                                <td>
+                                    <span class="ws-price">$@lineItem.Price.Original.ToString("#.00")</span>
+                                </td>
+                                <td>
+                                    <span class="ws-price">$@lineItem.LinePrice.ToString("#.00")</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="ws-box-footer">
+                <a class="ws-btn ws-btn-primary ws-btn-lg" href="#" id="btn-create-order">@T("Create order")</a>
+            </div>
+        </div>
+    }
+</div>
+<div class="ws-cart-info">
+    <div class="ws-box">
+        <div class="ws-box-header">
+            <h3>@T("Order total")</h3>
+            <h5>@T("Shipping costs and taxes will be calculated during checkout")</h5>
+        </div>
+        <ul class="ws-price-list">
+            <li>
+                @T("Subtotal"): <strong>$@Model.Checkout.Subtotal.ToString("#.00")</strong>
+            </li>
+            <li>
+                @T("Shipping"): <strong>$@Model.Checkout.ShippingPrice.ToString("#.00")</strong>
+            </li>
+            <li class="ws-important">
+                @T("Total"): <strong>$@Model.Checkout.Total.ToString("#.00")</strong>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>
+<script>
+    $(function () {
+        $("#btn-create-order").on("click", function () {
+            var form = $(this).parents("form");
+            var data = form.serialize();
+            var address = {
+                FirstName: $("#Address_FirstName").val(),
+                LastName: $("#Address_LastName").val(),
+                Email: $("#Address_Email").val(),
+                Phone: $("#Address_Phone").val(),
+                Company: $("#Address_Company").val(),
+                Country: $("#Address_Country").val(),
+                Province: $("#Address_Province").val(),
+                City: $("#Address_City").val(),
+                AddressLine1: $("#Address_AddressLine1").val(),
+                PostalCode: $("#Address_PostalCode").val()
+            };
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("Create", new { controller = "Checkout", area = "VirtoCommerce.Webshop" })",
+                data: {
+                    checkout: {
+                        BillingAddress: address,
+                        ShippingAddress: address,
+                        ShippingMethodId: $("input[name='ShippingMethodId']:checked").val(),
+                        PaymentMethodId: $("input[name='PaymentMethodId']:checked").val()
+                    },
+                    __RequestVerificationToken: "@Html.AntiForgeryTokenValueOrchard()"
+                },
+                success: function (jsonResponse) {
+                    if (jsonResponse) {
+                        if (jsonResponse.errorMessage) {
+                            alert(jsonResponse.errorMessage);
+                        } else {
+                            if (jsonResponse.htmlForm) {
+                                alert("HTML Form");
+                            }
+                            if (jsonResponse.redirectUrl) {
+                                window.location.href = jsonResponse.redirectUrl;
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    });
+</script>
