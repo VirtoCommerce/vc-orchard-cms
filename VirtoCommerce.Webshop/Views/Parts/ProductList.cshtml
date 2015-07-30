@@ -33,17 +33,19 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/masonry/3.3.1/masonry.pkgd.min.js"></script>
 <script>
-    var container = $(".vc-product-list");
-    var images = container.find("img");
+    $(function () {
+        var container = $(".vc-product-list");
+        var images = container.find("img");
 
-    var totalImages = images.length;
-    var totalLoaded = 0;
-    images.on("load", function () {
-        totalLoaded++;
-        if (totalImages === totalLoaded) {
-            container.masonry({
-                itemSelector: ".vc-product"
-            });
-        }
+        var totalImages = images.length;
+        var totalLoaded = 0;
+        images.on("load", function () {
+            totalLoaded++;
+            if (totalImages === totalLoaded) {
+                container.masonry({
+                    itemSelector: ".vc-product"
+                });
+            }
+        });
     });
 </script>

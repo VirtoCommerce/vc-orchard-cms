@@ -43,7 +43,7 @@ namespace VirtoCommerce.Webshop.Converters
 
             lineItemModel.Price = new Price
             {
-                Original = lineItem.Price,
+                Original = lineItem.BasePrice,
                 ProductId = lineItem.ProductId,
                 Sale = lineItem.Price
             };
