@@ -39,6 +39,10 @@ namespace VirtoCommerce.Webshop.Drivers
             if (!string.IsNullOrEmpty(customerId))
             {
                 checkoutModel = _shoppingCartService.GetCheckoutAsync(settings.StoreId, customerId).Result;
+                if (checkoutModel == null || checkoutModel != null && checkoutModel.LineItemCount <= 0)
+                {
+                    return ContentShape("Parts_EmptyShoppingCart", () => shapeHelper.Parts_EmptyShoppingCart());
+                }
             }
 
             return ContentShape("Parts_Checkout", () => shapeHelper.Parts_Checkout(

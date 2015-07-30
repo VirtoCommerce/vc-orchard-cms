@@ -1,43 +1,33 @@
-﻿<div class="ws-product-images">
-    <div class="ws-box">
-        <div class="ws-primary">
+﻿@{
+    Style.Require("LatoFont");
+    Style.Require("VirtoCommerceStore");
+}
+
+@{
+    var price = Model.Product.Price != null ? Model.Product.Price.Original : 0;
+}
+
+<div class="vc-one-third vc-product-images">
+    <div class="vc-box">
+        <div class="vc-primary">
             <img alt="@Model.Product.Name" src="@Model.Product.ImageUrl" />
         </div>
-        @*@if (Model.Product.Images.Count > 0)
-        {
-            <div class="ws-thumbs">
-                <ul class="ws-thumbs-list">
-                    @foreach (var imageSrc in Model.Product.Images)
-                    {
-                        <li>
-                            <a href="#">
-                                <img alt="@Model.Product.Name" src="@imageSrc" />
-                            </a>
-                        </li>
-                    }
-                </ul>
-            </div>
-        }*@
     </div>
 </div>
-<div class="ws-product-content">
-    <div class="ws-box">
-        <div class="ws-tab-content">
-            <div class="ws-details">
-                <input id="product-slug" type="hidden" value="@Model.Product.Slug" />
-                <h1>@Model.Product.Name</h1>
-                <div class="ws-prices">
-                    <span class="ws-price">$@Model.Product.Price.Original</span>
-                </div>
-            </div>
-            <div class="ws-description">
-                <p>
-                    @Model.Product.Description
-                </p>
-            </div>
-            <div class="ws-add-to-cart">
-                <button class="ws-btn ws-btn-primary ws-btn-lg ws-btn-block-xs" id="btn-add-to-cart">@T("Add to cart")</button>
-            </div>
+<div class="vc-two-third vc-product-info">
+    <div class="vc-box">
+        <div class="vc-title">
+            <input id="product-slug" type="hidden" value="@Model.Product.Slug" />
+            <h1>@Model.Product.Name</h1>
+            <span class="vc-price">$@price.ToString("#.00")</span>
+        </div>
+        <div class="vc-description">
+            <p>
+                @Model.Product.Description
+            </p>
+        </div>
+        <div class="vc-add-to-cart">
+            <button class="vc-btn vc-btn-primary" id="btn-add-to-cart">@T("Add to cart")</button>
         </div>
     </div>
 </div>
@@ -59,7 +49,7 @@
                         if (jsonResult.errorMessage) {
                             alert(jsonResult.errorMessage);
                         } else {
-                            $(".ws-mini-cart a").html("<span>" + jsonResult.shoppingCart.LineItemCount + "</span>");
+                            $(".vc-cart-preview a").html("<span>" + jsonResult.shoppingCart.LineItemCount + "</span>");
                         }
                     }
                 }

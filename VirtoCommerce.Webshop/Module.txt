@@ -1,11 +1,11 @@
-﻿Name: VirtoCommerce Webshop Demo
+﻿Name: VirtoCommerce Store
 AntiForgery: enabled
 Author: The VirtoCommerce team
 Website: http://virtocommerce.com
 Version: 1.0
 OrchardVersion: 1.0
-Description: VirtoCommerce 2 demo webshop
+Description: VirtoCommerce 2 store
 Category: Commerce
 Features:
     VirtoCommerce.Webshop:
-        Widgets for VirtoCommerce 2 demo webshop
+        Widgets for VirtoCommerce 2 store

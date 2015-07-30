@@ -11,7 +11,9 @@ namespace VirtoCommerce.Webshop.Services
 
         Task CreateShoppingCartAsync(ShoppingCart shoppingCart);
 
-        Task UpdateShoppingCartAsync(ShoppingCart shoppingCart, Checkout checkout);
+        Task UpdateShoppingCartAsync(ShoppingCart shoppingCart);
+
+        Task UpdateCheckoutAsync(Checkout checkout);
 
         Task DeleteShoppingCartAsync(string id);
 

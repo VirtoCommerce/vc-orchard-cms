@@ -1,26 +1,27 @@
-﻿<ul class="ws-product-list" id="isotope-content">
+﻿@{
+    Style.Require("LatoFont");
+    Style.Require("VirtoCommerceStore");
+}
+
+<ul class="vc-pagination">
+    @for (var p = 1; p <= Model.ProductList.TotalPageCount; p++)
+    {
+        <li class="@(Model.ProductList.PageIndex == p ? "selected" : string.Empty)">
+            <a href="@Href(string.Format("~/Category?id={0}&p={1}", Model.CategorySlug, p))">@p</a>
+        </li>
+    }
+</ul>
+<ul class="vc-product-list">
     @foreach (var product in Model.ProductList)
     {
-        <li class="ws-product-item">
+        <li class="vc-product">
             <a href="@Href(String.Format(product.UrlPattern, product.Slug))" title="@product.Name">
-                <div class="ws-image">
+                <div class="vc-image">
                     <img alt="@product.Name" src="@product.ImageUrl" />
-                    @if (product.Price.Sale > 0 && product.Price.Sale != product.Price.Original)
-                    {
-                        <span class="ws-badge ws-badge-sale">@T("SALE")</span>
-                    }
                 </div>
-                <div class="ws-title">
-                    <div class="ws-prices">
-                        @if (product.Price.Sale > 0 && product.Price.Sale != product.Price.Original)
-                        {
-                            <del class="ws-base">
-                                <span class="ws-amount">$@product.Price.Sale.Value</span>
-                            </del>
-                        }
-                        <span class="ws-price">
-                            <span class="ws-amount">$@product.Price.Original</span>
-                        </span>
+                <div class="vc-title">
+                    <div class="vc-price">
+                        <span class="vc-amount">$@(product.Price != null ? product.Price.Original : 0)</span>
                     </div>
                     <h3>@product.Name</h3>
                 </div>
@@ -29,10 +30,20 @@
     }
 </ul>
 
-<script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/masonry/3.3.1/masonry.pkgd.min.js"></script>
 <script>
-    $(".ws-product-list").masonry({
-        itemSelector: ".ws-product-item"
+    var container = $(".vc-product-list");
+    var images = container.find("img");
+
+    var totalImages = images.length;
+    var totalLoaded = 0;
+    images.on("load", function () {
+        totalLoaded++;
+        if (totalImages === totalLoaded) {
+            container.masonry({
+                itemSelector: ".vc-product"
+            });
+        }
     });
 </script>

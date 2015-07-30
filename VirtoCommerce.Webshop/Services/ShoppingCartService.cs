@@ -40,14 +40,16 @@ namespace VirtoCommerce.Webshop.Services
             return apiResponse.ToViewModel();
         }
 
-        public async Task UpdateShoppingCartAsync(ShoppingCart shoppingCart, Checkout checkout)
+        public async Task UpdateShoppingCartAsync(ShoppingCart shoppingCart)
         {
             var shoppingCartModel = shoppingCart.ToApiModel();
 
-            if (checkout != null)
-            {
-                shoppingCartModel = shoppingCart.ToApiModel(checkout);
-            }
+            await _apiClient.CartClient.UpdateCurrentCartAsync(shoppingCartModel).ConfigureAwait(false);
+        }
+
+        public async Task UpdateCheckoutAsync(Checkout checkout)
+        {
+            var shoppingCartModel = checkout.ToApiModel();
 
             await _apiClient.CartClient.UpdateCurrentCartAsync(shoppingCartModel).ConfigureAwait(false);
         }

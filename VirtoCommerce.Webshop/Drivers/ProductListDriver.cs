@@ -18,8 +18,6 @@ namespace VirtoCommerce.Webshop.Drivers
         private readonly ICatalogService _catalogService;
         private readonly IPriceService _priceService;
 
-        private const int PageSize = 18;
-
         public ProductListDriver(IOrchardServices orchardServices, ICatalogService catalogService, IPriceService priceService)
         {
             _orchardServices = orchardServices;
@@ -58,9 +56,10 @@ namespace VirtoCommerce.Webshop.Drivers
             var shopModel = _catalogService.GetShopsAsync().Result.FirstOrDefault(s => s.Id == settings.StoreId);
             var pricelistIds = _priceService.GetPricelistsAsync(shopModel.CatalogId, shopModel.Currency).Result;
 
-            var productList = _catalogService.SearchProductsAsync(settings.StoreId, settings.Culture, categoryId, pricelistIds, (page - 1) * PageSize, PageSize).Result;
+            var productList = _catalogService.SearchProductsAsync(settings.StoreId, settings.Culture, categoryId, pricelistIds, (page - 1) * settings.PageSize, settings.PageSize).Result;
 
             return ContentShape("Parts_ProductList", () => shapeHelper.Parts_ProductList(
+                CategorySlug: categorySlug,
                 ProductList: productList));
         }
     }

@@ -96,7 +96,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Scripts\jquery.infinitescroll.js" />
+    <Content Include="Scripts\masonry.pkgd.min.js" />
     <Content Include="Styles\cart.png" />
+    <Content Include="Styles\empty_cart.png" />
+    <Content Include="Styles\remove.png" />
+    <Content Include="Styles\virtocommerce-store.css" />
     <Content Include="Styles\webshop.css" />
     <Content Include="Web.config" />
     <Content Include="Scripts\Web.config" />

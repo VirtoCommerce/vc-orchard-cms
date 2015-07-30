@@ -1,14 +1,41 @@
-﻿<h2>@T("Thank you!")</h2>
-<p>@T("Order number"): @Model.Order.OrderNumber</p>
-<p>
-    @T("Financial status"): @Model.FinancialStatus
-</p>
-<p>
-    @T("Order items"):
-    <ul>
+﻿@{
+    Style.Require("LatoFont");
+    Style.Require("VirtoCommerceStore");
+}
+
+<div class="vc-box">
+    <div class="vc-box-header">
+        <h3>@T("Thank you!")</h3>
+    </div>
+    <div class="vc-box-content">
+        <p>@T("Order number"):<br /><strong style="font-size: 18px; font-weight: 600;">@Model.Order.OrderNumber</strong></p>
+    </div>
+</div>
+<div class="vc-box vc-cart-items">
+    <div class="vc-box-header">
+        <h3>@T("Items")</h3>
+    </div>
+    <table>
         @foreach (var lineItem in Model.Order.LineItems)
-        {
-            <li>@lineItem.Name</li>
+            {
+            <tr>
+                <td>
+                    <div class="vc-image">
+                        <img src="@lineItem.ImageUrl" title="@lineItem.Name" />
+                    </div>
+                </td>
+                <td>
+                    <h5 class="vc-item-name">@lineItem.Name</h5>
+                </td>
+                <td class="vc-quantity">
+                    <span>@lineItem.Quantity</span>
+                </td>
+                <td>
+                    <div class="vc-item-price">
+                        $@lineItem.LinePrice.ToString("0.00")
+                    </div>
+                </td>
+            </tr>
         }
-    </ul>
-</p>
+    </table>
+</div>

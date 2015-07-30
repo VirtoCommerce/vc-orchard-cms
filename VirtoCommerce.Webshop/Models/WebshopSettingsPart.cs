@@ -56,11 +56,7 @@ namespace VirtoCommerce.Webshop.Models
         {
             get
             {
-                return this.Retrieve(x => x.Culture);
-            }
-            set
-            {
-                this.Store(x => x.Culture, value);
+                return "en-US";
             }
         }
 
@@ -69,6 +65,14 @@ namespace VirtoCommerce.Webshop.Models
             get
             {
                 return "vcf.AnonymousId";
+            }
+        }
+
+        public int PageSize
+        {
+            get
+            {
+                return 18;
             }
         }
     }

@@ -1,20 +1,13 @@
 ﻿@{
     Style.Require("LatoFont");
-    Style.Require("Webshop");
+    Style.Require("VirtoCommerceStore");
 }
 
-<ul class="ws-main-menu">
+<ul class="vc-category-list">
     @foreach (var category in Model.Categories)
     {
-        <li>
-            @if (category.Slug == Model.CategorySlug)
-            {
-                <a class="ws-selected" href="@Href(String.Format(category.UrlPattern, category.Slug))">@category.Name</a>
-            }
-            else
-            {
-                <a href="@Href(String.Format(category.UrlPattern, category.Slug))">@category.Name</a>
-            }
+        <li class="@(category.Slug == Model.CategorySlug ? "selected" : string.Empty)">
+            <a href="@Href(String.Format(category.UrlPattern, category.Slug))">@category.Name</a>
         </li>
     }
 </ul>

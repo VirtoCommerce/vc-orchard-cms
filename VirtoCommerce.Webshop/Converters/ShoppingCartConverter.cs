@@ -32,16 +32,11 @@ namespace VirtoCommerce.Webshop.Converters
 
             if (shoppingCart.Addresses != null)
             {
-                var billingAddress = shoppingCart.Addresses.FirstOrDefault(a => a.Type == DataContracts.Cart.AddressType.Billing);
-                if (billingAddress != null)
+                var address = shoppingCart.Addresses.FirstOrDefault();
+                if (address != null)
                 {
-                    checkoutModel.BillingAddress = billingAddress.ToViewModel();
-                }
-
-                var shippingAddress = shoppingCart.Addresses.FirstOrDefault(a => a.Type == DataContracts.Cart.AddressType.Shipping);
-                if (shippingAddress != null)
-                {
-                    checkoutModel.ShippingAddress = shippingAddress.ToViewModel();
+                    checkoutModel.BillingAddress = address.ToViewModel();
+                    checkoutModel.ShippingAddress = address.ToViewModel();
                 }
             }
 
@@ -88,7 +83,7 @@ namespace VirtoCommerce.Webshop.Converters
             return checkoutModel;
         }
 
-        public static DataContracts.Cart.ShoppingCart ToApiModel(this ShoppingCart shoppingCart, Checkout checkout = null)
+        public static DataContracts.Cart.ShoppingCart ToApiModel(this ShoppingCart shoppingCart)
         {
             var shoppingCartModel = new DataContracts.Cart.ShoppingCart();
 
@@ -108,59 +103,66 @@ namespace VirtoCommerce.Webshop.Converters
             shoppingCartModel.SubTotal = shoppingCart.Subtotal;
             shoppingCartModel.Total = shoppingCart.Total;
 
-            if (checkout != null)
+            return shoppingCartModel;
+        }
+
+        public static DataContracts.Cart.ShoppingCart ToApiModel(this Checkout checkout)
+        {
+            var shoppingCart = (ShoppingCart)checkout;
+
+            var shoppingCartModel = shoppingCart.ToApiModel();
+
+            if (checkout.BillingAddress != null)
             {
-                if (checkout.BillingAddress != null)
+                if (shoppingCartModel.Addresses == null)
                 {
-                    if (shoppingCartModel.Addresses == null)
-                    {
-                        shoppingCartModel.Addresses = new List<DataContracts.Cart.Address>();
-                    }
-                    var billingAddress = checkout.BillingAddress.ToApiModel();
-                    billingAddress.Type = DataContracts.Cart.AddressType.Billing;
-
-                    shoppingCartModel.Addresses.Add(billingAddress);
+                    shoppingCartModel.Addresses = new List<DataContracts.Cart.Address>();
                 }
 
-                if (checkout.ShippingAddress != null)
-                {
-                    if (shoppingCartModel.Addresses == null)
-                    {
-                        shoppingCartModel.Addresses = new List<DataContracts.Cart.Address>();
-                    }
-                    var shippingAddress = checkout.ShippingAddress.ToApiModel();
-                    shippingAddress.Type = DataContracts.Cart.AddressType.Shipping;
+                var billingAddress = checkout.BillingAddress.ToApiModel();
+                billingAddress.Type = DataContracts.Cart.AddressType.Billing;
 
-                    shoppingCartModel.Addresses.Add(shippingAddress);
-                }
-
-                if (!string.IsNullOrEmpty(checkout.PaymentMethodId))
-                {
-                    shoppingCartModel.Payments = new List<DataContracts.Cart.Payment>();
-                    shoppingCartModel.Payments.Add(new DataContracts.Cart.Payment
-                    {
-                        Amount = checkout.Total,
-                        Currency = shoppingCart.Currency,
-                        PaymentGatewayCode = checkout.PaymentMethodId
-                    });
-                }
-
-                if (!string.IsNullOrEmpty(checkout.ShippingMethodId))
-                {
-                    shoppingCartModel.Shipments = new List<DataContracts.Cart.Shipment>();
-                    shoppingCartModel.Shipments.Add(new DataContracts.Cart.Shipment
-                    {
-                        Currency = shoppingCart.Currency,
-                        ShipmentMethodCode = checkout.ShippingMethodId,
-                        ShippingPrice = checkout.ShippingPrice
-                    });
-
-                    shoppingCartModel.ShippingTotal = checkout.ShippingPrice;
-                }
-
-                shoppingCartModel.SubTotal = checkout.Subtotal;
-                shoppingCartModel.Total = checkout.Total;
+                shoppingCartModel.Addresses.Add(billingAddress);
             }
+
+            if (checkout.ShippingAddress != null)
+            {
+                if (shoppingCartModel.Addresses == null)
+                {
+                    shoppingCartModel.Addresses = new List<DataContracts.Cart.Address>();
+                }
+                var shippingAddress = checkout.ShippingAddress.ToApiModel();
+                shippingAddress.Type = DataContracts.Cart.AddressType.Shipping;
+
+                shoppingCartModel.Addresses.Add(shippingAddress);
+            }
+
+            if (!string.IsNullOrEmpty(checkout.PaymentMethodId))
+            {
+                shoppingCartModel.Payments = new List<DataContracts.Cart.Payment>();
+                shoppingCartModel.Payments.Add(new DataContracts.Cart.Payment
+                {
+                    Amount = checkout.Total,
+                    Currency = checkout.Currency,
+                    PaymentGatewayCode = checkout.PaymentMethodId
+                });
+            }
+
+            if (!string.IsNullOrEmpty(checkout.ShippingMethodId))
+            {
+                shoppingCartModel.Shipments = new List<DataContracts.Cart.Shipment>();
+                shoppingCartModel.Shipments.Add(new DataContracts.Cart.Shipment
+                {
+                    Currency = checkout.Currency,
+                    ShipmentMethodCode = checkout.ShippingMethodId,
+                    ShippingPrice = checkout.ShippingPrice
+                });
+
+                shoppingCartModel.ShippingTotal = checkout.ShippingPrice;
+            }
+
+            shoppingCartModel.SubTotal = checkout.Subtotal;
+            shoppingCartModel.Total = checkout.Total;
 
             return shoppingCartModel;
         }

@@ -57,7 +57,7 @@ namespace VirtoCommerce.Webshop.Controllers
 
             shoppingCartModel.Add(productModel.ToLineItem(quantity, shopModel.Currency));
 
-            await _shoppingCartService.UpdateShoppingCartAsync(shoppingCartModel, null);
+            await _shoppingCartService.UpdateShoppingCartAsync(shoppingCartModel);
 
             return Json(new { shoppingCart = shoppingCartModel });
         }
@@ -87,7 +87,7 @@ namespace VirtoCommerce.Webshop.Controllers
 
             lineItemModel.Quantity = quantity;
 
-            await _shoppingCartService.UpdateShoppingCartAsync(shoppingCartModel, null);
+            await _shoppingCartService.UpdateShoppingCartAsync(shoppingCartModel);
 
             return Json(new { shoppingCart = shoppingCartModel });
         }
@@ -106,7 +106,7 @@ namespace VirtoCommerce.Webshop.Controllers
 
             shoppingCartModel.Remove(lineItemId);
 
-            await _shoppingCartService.UpdateShoppingCartAsync(shoppingCartModel, null);
+            await _shoppingCartService.UpdateShoppingCartAsync(shoppingCartModel);
 
             return Json(new { shoppingCart = shoppingCartModel });
         }

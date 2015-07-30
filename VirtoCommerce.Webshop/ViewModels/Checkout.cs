@@ -1,36 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace VirtoCommerce.Webshop.ViewModels
 {
-    public class Checkout
+    public class Checkout : ShoppingCart
     {
         public Checkout()
         {
-            ShippingAddress = new Address();
-            LineItems = new List<LineItem>();
             ShippingMethods = new List<ShippingMethod>();
             PaymentMethods = new List<PaymentMethod>();
         }
 
-        public string Id { get; set; }
-
-        public string CustomerId { get; set; }
-
-        public string Currency { get; set; }
-
-        public string Culture { get; set; }
-
-        public string StoreId { get; set; }
-
-        public string Name { get; set; }
-
+        [Required]
         public Address BillingAddress { get; set; }
 
+        [Required]
         public Address ShippingAddress { get; set; }
-
-        public ICollection<LineItem> LineItems { get; private set; }
 
         [Required]
         public string ShippingMethodId { get; set; }
@@ -41,14 +28,6 @@ namespace VirtoCommerce.Webshop.ViewModels
         public ICollection<ShippingMethod> ShippingMethods { get; private set; }
 
         public ICollection<PaymentMethod> PaymentMethods { get; private set; }
-
-        public decimal Subtotal
-        {
-            get
-            {
-                return LineItems.Sum(li => li.LinePrice);
-            }
-        }
 
         public decimal ShippingPrice
         {
@@ -69,12 +48,32 @@ namespace VirtoCommerce.Webshop.ViewModels
             }
         }
 
-        public decimal Total
+        public string GetError()
         {
-            get
+            string errorMessage = null;
+
+            if (BillingAddress == null)
             {
-                return Subtotal + ShippingPrice;
+                errorMessage = "Billing address is required";
             }
+            if (LineItemCount <= 0)
+            {
+                errorMessage = "Line items quantity cannot be less or equal 0";
+            }
+            if (string.IsNullOrEmpty(PaymentMethodId))
+            {
+                errorMessage = "Payment method is required";
+            }
+            if (ShippingAddress == null)
+            {
+                errorMessage = "Shipping address is required";
+            }
+            if (string.IsNullOrEmpty(ShippingMethodId))
+            {
+                errorMessage = "Shipping method is required";
+            }
+
+            return errorMessage;
         }
     }
 }
