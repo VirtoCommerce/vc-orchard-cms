@@ -1,9 +1,9 @@
 ﻿Name: VirtoCommerce Store
 AntiForgery: enabled
-Author: The VirtoCommerce team
+Author: VirtoCommerce
 Website: http://virtocommerce.com
-Version: 1.0
-OrchardVersion: 1.0
+Version: 1.0.1
+OrchardVersion: 1.9.1
 Description: VirtoCommerce 2 store
 Category: Commerce
 Features:

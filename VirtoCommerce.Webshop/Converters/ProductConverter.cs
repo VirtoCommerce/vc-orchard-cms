@@ -12,7 +12,7 @@ namespace VirtoCommerce.Webshop.Converters
             var productModel = new Product();
 
             productModel.CatalogId = product.CatalogId;
-            productModel.CategoryId = product.Categories != null ? product.Categories.First() : "fake";
+            productModel.CategoryId = "fake";
 
             if (product.EditorialReviews != null)
             {
