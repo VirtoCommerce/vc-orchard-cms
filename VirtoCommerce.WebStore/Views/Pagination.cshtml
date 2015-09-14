@@ -1,0 +1,25 @@
+﻿@using VirtoCommerce.WebStore.ViewModels
+
+@{
+    var currentCategory = (Category)Model.Category;
+    var products = (PagedList<Product>)Model.ProductList;
+}
+
+@if (products.TotaPagesCount > 1)
+{
+    <ul class="vc-pagination">
+        @for (var page = 1; page <= products.TotaPagesCount; page++)
+        {
+            <li class="@(page == products.PageIndex ? "selected" : string.Empty)">
+                @if (currentCategory != null)
+                {
+                    <a href="@Href(string.Format("~/category/{0}/{1}", currentCategory.Slug, page))">@page</a>
+                }
+                else
+                {
+                    <a href="@Href(string.Format("~/{0}", page))">@page</a>
+                }
+            </li>
+        }
+    </ul>
+}

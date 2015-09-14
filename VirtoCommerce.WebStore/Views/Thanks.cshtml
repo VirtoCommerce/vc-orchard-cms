@@ -1,0 +1,46 @@
+﻿@using VirtoCommerce.WebStore.ViewModels
+
+@{
+    Style.Require("LatoFont");
+    Style.Require("VirtoCommerce.WebStore");
+
+    var order = (Order)Model.Order;
+}
+
+<div class="vc-box">
+    <div class="vc-box-header">
+        <h3>@T("Thank you!")</h3>
+    </div>
+    <div class="vc-box-content">
+        <p>@T("Order number"):<br /><strong style="font-size: 18px; font-weight: 600;">@order.Number</strong></p>
+        <p>@T("Total price"):<br /><strong style="font-size: 18px; font-weight: 600;">$@order.Total.ToString("0.00")</strong></p>
+    </div>
+</div>
+<div class="vc-box vc-cart-items">
+    <div class="vc-box-header">
+        <h3>@T("Items")</h3>
+    </div>
+    <table>
+        @foreach (var lineItem in order.LineItems)
+        {
+            <tr>
+                <td>
+                    <div class="vc-image">
+                        <img src="@lineItem.Image.Url" title="@lineItem.Image.AlternateText" />
+                    </div>
+                </td>
+                <td>
+                    <h5 class="vc-item-name">@lineItem.Title</h5>
+                </td>
+                <td class="vc-quantity">
+                    <span>@lineItem.Quantity</span>
+                </td>
+                <td>
+                    <div class="vc-item-price">
+                        $@lineItem.LinePrice.ToString("0.00")
+                    </div>
+                </td>
+            </tr>
+        }
+    </table>
+</div>

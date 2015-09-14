@@ -1,0 +1,55 @@
+﻿@using VirtoCommerce.WebStore.ViewModels
+
+@{
+    Style.Require("LatoFont");
+    Style.Require("VirtoCommerce.WebStore");
+
+    Script.Require("jQuery").AtFoot();
+    Script.Require("Masonry").AtFoot();
+    Script.Require("VirtoCommerce.WebStore").AtFoot();
+
+    var currentCategory = (Category)Model.Category;
+    var categories = (IEnumerable<Category>)Model.CategoryList;
+    var products = (PagedList<Product>)Model.ProductList;
+    var cart = (Cart)Model.ShoppingCart;
+}
+
+@{
+    Html.RenderPartial("CartPreview");
+    Html.RenderPartial("CategoryList");
+}
+
+@if (currentCategory != null)
+{
+    <h1>@currentCategory.Title</h1>
+}
+
+@{
+    Html.RenderPartial("Pagination");
+}
+
+<ul class="vc-product-list">
+    @foreach (var product in products)
+    {
+        <li class="vc-product">
+            <a href="@Href(string.Format("~/product/{0}", product.Slug))" title="@product.Title">
+                <div class="vc-image">
+                    @if (product.FeaturedImage != null)
+                    {
+                        <img alt="@product.FeaturedImage.AlternateText" src="@product.FeaturedImage.Url" title="@product.FeaturedImage.AlternateText" />
+                    }
+                </div>
+                <div class="vc-title">
+                    <div class="vc-price">
+                        <span class="vc-amount">$@product.Price.Original</span>
+                    </div>
+                    <h3>@product.Title</h3>
+                </div>
+            </a>
+        </li>
+    }
+</ul>
+
+@{
+    Html.RenderPartial("Pagination");
+}

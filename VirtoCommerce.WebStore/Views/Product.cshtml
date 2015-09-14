@@ -1,0 +1,41 @@
+﻿@using VirtoCommerce.WebStore.ViewModels
+
+@{
+    Style.Require("LatoFont");
+    Style.Require("VirtoCommerce.WebStore");
+
+    Script.Require("jQuery").AtFoot();
+    Script.Require("VirtoCommerce.WebStore").AtFoot();
+
+    var product = (Product)Model.Product;
+}
+
+@{
+    Html.RenderPartial("CartPreview");
+    Html.RenderPartial("CategoryList");
+}
+
+<div class="vc-one-third vc-product-images">
+    <div class="vc-box">
+        <div class="vc-primary">
+            @if (product.FeaturedImage != null)
+            {
+                <img alt="@product.FeaturedImage.AlternateText" src="@product.FeaturedImage.Url" title="@product.FeaturedImage.AlternateText" />
+            }
+        </div>
+    </div>
+</div>
+<div class="vc-two-third vc-product-info">
+    <div class="vc-box">
+        <div class="vc-title">
+            <h1>@product.Title</h1>
+            <span class="vc-price">$@product.Price.Original</span>
+        </div>
+        <div class="vc-description">
+            <p>@Html.Raw(product.Description)</p>
+        </div>
+        <div class="vc-add-to-cart">
+            <button class="vc-btn vc-btn-primary" data-url="@Url.Action("AddItem", new { @area = "VirtoCommerce.WebStore", @controller = "ShoppingCart", @slug = product.Slug })" id="btn-add-to-cart" type="button">@T("Add to cart")</button>
+        </div>
+    </div>
+</div>

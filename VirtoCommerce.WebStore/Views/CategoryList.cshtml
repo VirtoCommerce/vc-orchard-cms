@@ -1,0 +1,18 @@
+﻿@using VirtoCommerce.WebStore.ViewModels
+
+@{
+    var currentCategory = (Category)Model.Category;
+    var categories = (IEnumerable<Category>)Model.CategoryList;
+}
+
+<ul class="vc-category-list">
+    @foreach (var category in categories)
+    {
+        if (!string.IsNullOrEmpty(category.Slug))
+        {
+            <li class="@(currentCategory != null && currentCategory.Slug == category.Slug ? "selected" : string.Empty)">
+                <a href="@Href(string.Format("~/category/{0}", category.Slug))">@category.Title</a>
+            </li>
+        }
+    }
+</ul>

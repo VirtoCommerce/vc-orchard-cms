@@ -1,0 +1,15 @@
+﻿@using VirtoCommerce.WebStore.ViewModels
+
+@{
+    var cart = (Cart)Model.ShoppingCart;
+}
+
+
+<div class="vc-cart-preview">
+    <a href="@Href("~/cart")" title="@T("Go to cart")">
+        @if (cart != null && cart.LineItemsCount > 0)
+        {
+            <span>@cart.LineItemsCount</span>
+        }
+    </a>
+</div>

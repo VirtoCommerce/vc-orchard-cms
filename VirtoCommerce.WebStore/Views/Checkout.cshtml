@@ -1,0 +1,163 @@
+﻿@using VirtoCommerce.WebStore.ViewModels
+
+@{
+    Style.Require("LatoFont");
+    Style.Require("VirtoCommerce.WebStore");
+
+    Script.Require("jQuery").AtFoot();
+    Script.Require("VirtoCommerce.WebStore").AtFoot();
+
+    var checkout = (Checkout)Model.Checkout;
+}
+
+<div class="vc-two-third vc-cart-items">
+    @using (Html.BeginForm("CreateOrder", "Checkout", new { @area = "VirtoCommerce.WebStore" }, FormMethod.Post, new { @id = "frm-checkout" }))
+    {
+        @Html.Hidden("__RequestVerificationToken", Html.AntiForgeryTokenValueOrchard(), new { @id = "__RequestVerificationToken" })
+        <div class="vc-box">
+            <div class="vc-box-header">
+                <h3>@T("Address")</h3>
+            </div>
+            <div class="vc-box-content">
+                <div class="vc-column">
+                    <div class="vc-control-group">
+                        <label for="address_first_name">@T("First name")</label>
+                        @Html.TextBoxFor(m => checkout.ShippingAddress.FirstName)
+                    </div>
+                    <div class="vc-control-group">
+                        <label for="address_last_name">@T("Last name")</label>
+                        @Html.TextBoxFor(m => checkout.ShippingAddress.LastName)
+                    </div>
+                    <div class="vc-control-group">
+                        <label for="address_email">@T("Email address")</label>
+                        @Html.TextBoxFor(m => checkout.Email)
+                    </div>
+                    <div class="vc-control-group">
+                        <label for="address_phone">@T("Phone number")</label>
+                        @Html.TextBoxFor(m => checkout.ShippingAddress.Phone)
+                    </div>
+                    <div class="vc-control-group">
+                        <label for="address_company">@T("Company")</label>
+                        @Html.TextBoxFor(m => checkout.ShippingAddress.Company)
+                    </div>
+                </div>
+                <div class="vc-column">
+                    <div class="vc-control-group">
+                        <label for="address_country">@T("Country")</label>
+                        @Html.TextBoxFor(m => checkout.ShippingAddress.Country)
+                    </div>
+                    <div class="vc-control-group">
+                        <label for="address_province">@T("Province")</label>
+                        @Html.TextBoxFor(m => checkout.ShippingAddress.Province)
+                    </div>
+                    <div class="vc-control-group">
+                        <label for="address_city">@T("City")</label>
+                        @Html.TextBoxFor(m => checkout.ShippingAddress.City)
+                    </div>
+                    <div class="vc-control-group">
+                        <label for="address_address_line1">@T("Address")</label>
+                        @Html.TextBoxFor(m => checkout.ShippingAddress.Line1)
+                    </div>
+                    <div class="vc-control-group">
+                        <label for="address_postal_code">@T("Postal code")</label>
+                        @Html.TextBoxFor(m => checkout.ShippingAddress.PostalCode)
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="vc-box">
+            <div class="vc-box-header">
+                <h3>@T("Shipping method")</h3>
+            </div>
+            <div class="vc-box-content">
+                <ul class="vc-checkout-methods" id="shipping">
+                    @foreach (var shippingMethod in checkout.ShippingMethods)
+                    {
+                        <li>
+                            @Html.RadioButtonFor(m => checkout.ShippingMethodId, shippingMethod.Keyword, new { @id = "checkout_ShippingMethodId_" + shippingMethod.Keyword, @data_url = Url.Action("SetShippingMethod", new { @area = "VirtoCommerce.WebStore", @controller = "Checkout", @shippingMethodId = shippingMethod.Keyword }) })
+                            @shippingMethod.Title -
+                            <strong>
+                                @if (shippingMethod.Price > 0)
+                                {
+                                    string.Format("${0}", shippingMethod.Price.ToString("0.##"));
+                                }
+                                else
+                                {
+                                    @T("FREE")
+                                }
+                            </strong>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="vc-box">
+            <div class="vc-box-header">
+                <h3>@T("Payment method")</h3>
+            </div>
+            <div class="vc-box-content">
+                <ul class="vc-checkout-methods" id="payment">
+                    @foreach (var paymentMethod in checkout.PaymentMethods)
+                    {
+                        <li>
+                            @Html.RadioButtonFor(m => checkout.PaymentMethodId, paymentMethod.Keyword, new { @id = "checkout_PaymentMethodId_" + paymentMethod.Keyword })
+                            @paymentMethod.Title
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+    <div class="vc-box vc-cart-items">
+        <div class="vc-box-header">
+            <h3>@T("Items")</h3>
+        </div>
+        <table>
+            @foreach (var lineItem in checkout.LineItems)
+            {
+                <tr>
+                    <td>
+                        <div class="vc-image">
+                            @if (lineItem.Image != null)
+                            {
+                                <img alt="@lineItem.Image.AlternateText" src="@lineItem.Image.Url" title="@lineItem.Image.AlternateText" />
+                            }
+                        </div>
+                    </td>
+                    <td>
+                        <h5 class="vc-item-name">@lineItem.Title</h5>
+                    </td>
+                    <td class="vc-quantity">
+                        <span>@lineItem.Quantity</span>
+                    </td>
+                    <td>
+                        <div class="vc-item-price">
+                            $@lineItem.LinePrice.ToString("0.##")
+                        </div>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+<div class="vc-one-third vc-cart-info">
+    <div class="vc-box">
+        <div class="vc-box-header">
+            <h3>@T("Order totals")</h3>
+        </div>
+        <ul class="vc-totals">
+            <li>
+                @T("Subtotal"):<strong>$@checkout.Subtotal.ToString("0.##")</strong>
+            </li>
+            <li>
+                @T("Shipping"):<strong>$@checkout.ShippingPrice.ToString("0.##")</strong>
+            </li>
+            <li class="vc-important">
+                @T("Total"):<strong>$@checkout.Total.ToString("0.##")</strong>
+            </li>
+            <li>
+                <button class="vc-btn vc-btn-primary" id="btn-create-order" type="button">@T("Create order")</button>
+            </li>
+        </ul>
+    </div>
+</div>

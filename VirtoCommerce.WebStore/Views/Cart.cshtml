@@ -1,0 +1,70 @@
+﻿@using VirtoCommerce.WebStore.ViewModels
+
+@{
+    Style.Require("Latofont");
+    Style.Require("VirtoCommerce.WebStore");
+
+    Script.Require("jQuery").AtFoot();
+    Script.Require("VirtoCommerce.WebStore").AtFoot();
+
+    var cart = (Cart)Model.ShoppingCart;
+}
+
+@{
+    Html.RenderPartial("CartPreview");
+}
+
+<div class="vc-two-third vc-cart-items">
+    <div class="vc-box">
+        <div class="vc-box-header">
+            <h3>@T("Shopping cart")</h3>
+        </div>
+        <table>
+            @foreach (var lineItem in cart.LineItems)
+            {
+                <tr>
+                    <td>
+                        <div class="vc-image">
+                            @if (lineItem.Image != null)
+                            {
+                                <img alt="@lineItem.Image.AlternateText" src="@lineItem.Image.Url" title="@lineItem.Image.AlternateText" />
+                            }
+                        </div>
+                    </td>
+                    <td>
+                        <h5 class="vc-item-name">@lineItem.Title</h5>
+                    </td>
+                    <td class="vc-quantity">
+                        <input data-line-item-id="@lineItem.Id" data-url="@Url.Action("UpdateLineItem", new { @area = "VirtoCommerce.WebStore", @controller = "ShoppingCart", @lineItemId = lineItem.Id })" type="text" value="@lineItem.Quantity" />
+                    </td>
+                    <td>
+                        <div class="vc-item-price">
+                            $@lineItem.LinePrice.ToString("#.00")
+                        </div>
+                    </td>
+                    <td>
+                        <div class="vc-remove-item" data-url="@Url.Action("DeleteLineItem", new { @area = "VirtoCommerce.WebStore", @controller = "ShoppingCart", @lineItemId = lineItem.Id })" title="@T("Remove item")"></div>
+                    </td>
+                </tr>
+            }
+        </table>
+        <div class="vc-box-footer">
+            <a class="vc-btn vc-btn-primary vc-right" href="@Href("~/checkout")">@T("Proceed to checkout")</a>
+        </div>
+    </div>
+</div>
+<div class="vc-one-third vc-cart-info">
+    <div class="vc-box">
+        <div class="vc-box-header">
+            <h3>@T("Order totals")</h3>
+        </div>
+        <ul class="vc-totals">
+            <li>
+                @T("Subtotal"):<strong>$@Model.ShoppingCart.Subtotal.ToString("#.00")</strong>
+            </li>
+            <li class="vc-important">
+                @T("Total"):<strong>$@Model.ShoppingCart.Total.ToString("#.00")</strong>
+            </li>
+        </ul>
+    </div>
+</div>
